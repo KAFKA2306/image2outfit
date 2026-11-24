@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import socketserver
 import sys
 import zipfile
@@ -721,12 +722,21 @@ def collect_product(
     mesh_report = workspace / "Previews/Mesh/mesh-showcase.json"
     if mesh_report.is_file():
         mesh = load_json(mesh_report, {})
-        source = (root / mesh.get("sourcePath", "")).resolve()
-        if (
-            root in source.parents
+        source_path = mesh.get("sourcePath")
+        source = (root / source_path).resolve() if isinstance(source_path, str) else None
+        source_file_matches = bool(
+            source is not None
+            and root in source.parents
             and source.is_file()
             and digest(source) == mesh.get("sourceSha256")
-        ):
+        )
+        local_source_hash_bound = (
+            source is None
+            and mesh.get("sourceAvailability") == "LOCAL_ONLY_NOT_DISTRIBUTED"
+            and isinstance(mesh.get("sourceSha256"), str)
+            and re.fullmatch(r"[0-9a-f]{64}", mesh["sourceSha256"]) is not None
+        )
+        if source_file_matches or local_source_hash_bound:
             for record in mesh.get("records", []):
                 target = (root / record["path"]).resolve()
                 if workspace.resolve() not in target.parents or target.suffix != ".svg":

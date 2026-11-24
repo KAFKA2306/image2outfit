@@ -57,11 +57,15 @@ def main():
     ]
     out = root / job["productRoot"] / "Previews/Mesh"
     out.mkdir(parents=True, exist_ok=True)
+    source_relative = source.relative_to(root).as_posix()
+    source_is_local_runtime = source_relative.startswith((".image2outfit/", "Assets/_Local/"))
     report = {
         "schemaVersion": 1,
         "productId": job["id"],
-        "sourcePath": source.relative_to(root).as_posix(),
+        # Preserve content identity without publishing the machine-local runtime path.
+        "sourcePath": None if source_is_local_runtime else source_relative,
         "sourceSha256": digest(source),
+        "sourceAvailability": "LOCAL_ONLY_NOT_DISTRIBUTED" if source_is_local_runtime else "REPOSITORY_SOURCE",
         "blenderVersion": bpy.app.version_string,
         "objects": [],
         "records": [],
@@ -134,8 +138,8 @@ def main():
                 }
             )
         report["status"] = "GENERATED_UNVERIFIED"
-    (out / "mesh-showcase.json").write_text(
-        json.dumps(report, indent=2) + "\n", encoding="utf-8"
+    (out / "mesh-showcase.json").write_bytes(
+        (json.dumps(report, indent=2) + "\n").encode("utf-8")
     )
     print(json.dumps({k: v for k, v in report.items() if k != "objects"}))
 

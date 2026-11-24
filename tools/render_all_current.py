@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -25,6 +26,23 @@ import review_console
 from resolve_product_build_scope import resolve
 
 IMAGE_SUFFIXES = {".png", ".webp", ".jpg", ".jpeg"}
+PUBLIC_INTERNAL_PATH_RE = re.compile(
+    r"(?i)(?:\.image2outfit(?:[\\/][^\s\"'<>]+)?|"
+    r"Assets[\\/]_Local(?:[\\/][^\s\"'<>]+)?|"
+    r"(?<![A-Z0-9+.-])[A-Z]:[\\/][^\s\"'<>]+|"
+    r"/(?:home|tmp|mnt|var|workspace)/[^\s\"'<>]+)"
+)
+
+
+def redact_public_runtime_paths(value: Any) -> Any:
+    """Keep local runtime locations out of public JSON projections."""
+    if isinstance(value, dict):
+        return {key: redact_public_runtime_paths(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [redact_public_runtime_paths(item) for item in value]
+    if isinstance(value, str):
+        return PUBLIC_INTERNAL_PATH_RE.sub("[local evidence path omitted]", value)
+    return value
 
 
 def run_logged(command: list[str], log_path: Path, env: dict[str, str]) -> int:
@@ -527,12 +545,24 @@ def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
                 raise RuntimeError(f"missing io asset: {href}")
 
 
-def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
+def build_site(site: Path) -> dict[str, Any]:
     data = review_console.build(ROOT, ROOT)
     site.mkdir(parents=True, exist_ok=True)
+    (site / ".image2outfit" / "render-current-summary.json").unlink(missing_ok=True)
 
     for name in ("index.html", "review-console.json"):
-        shutil.copy2(ROOT / name, site / name)
+        source = ROOT / name
+        destination = site / name
+        if source.suffix.lower() == ".json":
+            payload = redact_public_runtime_paths(
+                json.loads(source.read_text(encoding="utf-8"))
+            )
+            destination.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            shutil.copy2(source, destination)
     for name in ("review-showcase.css", "review-showcase.js"):
         shutil.copy2(ROOT / "site" / name, site / name)
 
@@ -567,12 +597,16 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
             continue
         destination = site / href
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
-
-    if summary_path.is_file():
-        destination = site / ".image2outfit" / "render-current-summary.json"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(summary_path, destination)
+        if source.suffix.lower() == ".json":
+            payload = redact_public_runtime_paths(
+                json.loads(source.read_text(encoding="utf-8"))
+            )
+            destination.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            shutil.copy2(source, destination)
 
     gallery = build_io_gallery(site)
     validate_io_gallery(gallery, site)
@@ -670,7 +704,7 @@ def main() -> int:
     )
 
     site = args.site if args.site.is_absolute() else ROOT / args.site
-    data = build_site(site, summary_path)
+    data = build_site(site)
     print(
         json.dumps(
             {
