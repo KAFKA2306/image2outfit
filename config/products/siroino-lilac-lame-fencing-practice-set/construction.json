@@ -20,7 +20,8 @@
     "shorts-back-right",
     "jacket-elbow-quilt-overlay",
     "waistband-front",
-    "waistband-back"
+    "waistband-back",
+    "shorts-gusset"
   ],
   "requiredPatternComponents": [
     {
@@ -55,9 +56,10 @@
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
-        "shorts-back-right"
+        "shorts-back-right",
+        "shorts-gusset"
       ],
-      "reason": "Directly visible under the overskirt in front, side, and rear views; waistband and crotch construction are not resolved by the concept image."
+      "reason": "A separate center gusset is added as an explicit prototype construction hypothesis to test seated/crouched coverage; the reference reveals the shorts silhouette but not gusset construction. Its grain, ease, fabric behavior, coverage, and fit remain unmeasured and unapproved."
     }
   ],
   "separateGeometry": [
@@ -116,13 +118,13 @@
     },
     "prototypeFrameEnd": 16,
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
-    "reason": "The 40 mm overskirt hem extension and four-panel shorts pelvis-blend trial still show thigh exposure in directly inspected sit/crouch renders. The next prototype changes the connected shorts pattern itself by extending its inner center rise 50 mm while preserving matched seams. This is a seat-coverage geometry trial, not a separate gusset, and grants no fit, Shape Key, opacity, motion or release acceptance.",
+    "reason": "The four-panel shorts with extended lower rise still show thigh exposure in directly inspected sit/crouch renders. The next prototype adds a distinct four-edge center gusset matched to the existing rise-edge lengths, then rerenders. This is an unapproved construction/coverage hypothesis; it grants no fit, Shape Key, opacity, motion, or release acceptance.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/skirt-bending-component-rebind-c30298d99707954c.json",
-        "evidenceSha256": "c30298d99707954c270eda62d3e8f2f8a288e0941ec1a35b1ad62e108f918f58",
-        "evidenceBoundary": "Hash-bound baseline component-invariance rebind for the isolated pleated-overskirt; skirt and stitched neighbors were verified unchanged while only shorts panels changed. Evidence is distributed under Evidence/Build; no cloth remeasurement, fit, pose or visual acceptance is claimed."
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-1b24556a334f6784.json",
+        "evidenceSha256": "1b24556a334f678434d205fd2d47f1f6baec793601c20a4d10707f01988fe892",
+        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20, rebound from baseline 9e1edf4 (c30298d99707954c) after verifying component and stitched-seam invariance. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
   },
@@ -147,7 +149,8 @@
         "shorts-back-left",
         "shorts-back-right",
         "waistband-front",
-        "waistband-back"
+        "waistband-back",
+        "shorts-gusset"
       ],
       "bodyTriangleZM": [
         0.42,
@@ -183,7 +186,8 @@
             "shorts-front-left",
             "shorts-front-right",
             "shorts-back-left",
-            "shorts-back-right"
+            "shorts-back-right",
+            "shorts-gusset"
           ],
           "hipBone": "Hips",
           "leftThighBone": "UpperLeg_L",
@@ -192,7 +196,7 @@
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
           "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "After a 40 mm hem extension on all four shorts panels, the current prototype reaches z=0.3896 m against the measured 0.4144 m knee landmark, yet directly inspected sit/crouch renders still expose the thighs. Measured thigh weighting remains a hypothesis (mean 0.243, maximum 0.65); next correction must address seat/gusset tracking, not another unmeasured hem extension. No coverage, deformation, fit, Shape Key or runtime acceptance."
+          "evidenceBoundary": "The four shorts panels previously ended at a measured prototype lower center rise, but directly inspected sit/crouch renders still exposed thigh. Include the separate gusset in the same provisional hip/thigh weight region. The combined weight response and coverage are still unmeasured; no pose, fit, penetration, deformation, Shape Key or runtime acceptance."
         }
       ]
     }

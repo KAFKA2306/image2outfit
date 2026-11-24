@@ -551,17 +551,16 @@ def build_site(site: Path) -> dict[str, Any]:
     (site / ".image2outfit" / "render-current-summary.json").unlink(missing_ok=True)
 
     for name in ("index.html", "review-console.json"):
-        source = ROOT / name
         destination = site / name
-        if source.suffix.lower() == ".json":
-            payload = redact_public_runtime_paths(
-                json.loads(source.read_text(encoding="utf-8"))
-            )
-            destination.write_text(
-                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
+        if name == "review-console.json":
+            payload = redact_public_runtime_paths(data)
+            destination.write_bytes(
+                (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode(
+                    "utf-8"
+                )
             )
         else:
+            source = ROOT / name
             shutil.copy2(source, destination)
     for name in ("review-showcase.css", "review-showcase.js"):
         shutil.copy2(ROOT / "site" / name, site / name)
@@ -601,9 +600,10 @@ def build_site(site: Path) -> dict[str, Any]:
             payload = redact_public_runtime_paths(
                 json.loads(source.read_text(encoding="utf-8"))
             )
-            destination.write_text(
-                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
+            destination.write_bytes(
+                (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode(
+                    "utf-8"
+                )
             )
         else:
             shutil.copy2(source, destination)

@@ -29,7 +29,7 @@
     if (Number.isNaN(date.getTime())) return String(value || '不明');
     return new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' }).format(date);
   };
-  const imageAssets = (product) => (product?.assets || []).filter((asset) => asset.href);
+  const imageAssets = (product) => (product?.assets || []).filter((asset) => asset.href && asset.kind !== 'mesh-report');
   const orderedImages = (product) => {
     const priority = ['front', 'three-quarter', 'back', 'left', 'right'];
     return imageAssets(product).slice().sort((a, b) => {
@@ -114,7 +114,7 @@
     const manifestHref = safeHref(product.manifest_href);
     const reviewHref = safeHref(product.human_review_url);
     const blockers = product.blockers || [];
-    const passedImages = (product.assets || []).filter((asset) => asset.href && asset.status === 'PASS').length;
+    const passedImages = imageAssets(product).filter((asset) => asset.status === 'PASS').length;
 
     root.innerHTML = `
       <header class="showcase-header">
@@ -159,8 +159,9 @@
 
         <section class="section-block" id="mesh-details">
           <div class="section-head"><h2>UV・トポロジー</h2><p>衣装メッシュの辺と実際のUV配置を展示します。品質やVRChat動作の合格を示すものではありません。</p></div>
-          <div class="render-wall">${images.filter(a => a.kind === 'mesh').map(a => `<article class="render-tile"><a href="${safeHref(a.href)}"><img src="${safeHref(a.href)}" alt="${esc(a.name)}"><span>${a.name === 'uv' ? 'UV配置' : 'トポロジー（正面投影・背面の辺も表示）'}</span></a></article>`).join('')}</div>
-          ${images.some(a => a.name === 'uv' && a.kind === 'mesh') ? '' : '<p>UV配置は未作成、または現在の3Dデータに結び付いた展示図が未生成です。</p>'}
+          <div class="render-wall">${images.filter(a => a.kind === 'mesh').map(a => `<article class="render-tile"><a href="${safeHref(a.href)}"><img src="${safeHref(a.href)}" alt="${esc(a.name)}"><span>${a.name === 'uv' ? 'UV配置' : 'トポロジー（正面投影・背面の辺も表示）'}</span></a><small>SHA-256 ${esc(a.sha256 || '不明')}</small></article>`).join('')}</div>
+          ${product.mesh_uv_status === 'MISSING' ? '<p>UV配置: 未作成</p>' : product.mesh_uv_status ? `<p>UV配置: ${esc(product.mesh_uv_status)}</p>` : '<p>UV配置: 未作成、または出典の確認待ちです。</p>'}
+          ${product.mesh_source_sha256 ? `<p>3Dソース SHA-256: <code>${esc(product.mesh_source_sha256)}</code> · ${product.mesh_source_availability === 'LOCAL_ONLY_NOT_DISTRIBUTED' ? 'モデル本体は公開していません。' : 'ソースの配布状態はレポートを参照してください。'} ${product.mesh_report_href ? `<a href="${safeHref(product.mesh_report_href)}">ソース・図のハッシュ詳細</a>` : ''}</p>` : '<p>3Dソースのハッシュ情報は未登録です。</p>'}
           ${images.some(a => a.name === 'topology' && a.kind === 'mesh') ? '' : '<p>トポロジー展示図は準備中です。</p>'}
         </section>
 

@@ -54,7 +54,18 @@ def resolve_private_reference(
     )
     candidates: list[Path] = []
     if isinstance(explicit, str) and explicit:
-        candidates.append((repository_root / explicit).resolve())
+        explicit_path = (repository_root / explicit).resolve()
+        if explicit_path.is_file():
+            actual_hash = _sha256(explicit_path)
+            if actual_hash != expected_hash:
+                raise ValueError(
+                    "private reference image hash mismatch; expected "
+                    f"{expected_hash}, found "
+                    f"{explicit_path.relative_to(repository_root).as_posix()}="
+                    f"{actual_hash}"
+                )
+            return explicit_path
+        candidates.append(explicit_path)
 
     roots = job.get("privateSourceRoots", [])
     if not isinstance(roots, list):

@@ -244,6 +244,11 @@ class Product:
     evidence: list[Evidence]
     downloads: list[dict[str, Any]] = field(default_factory=list)
     completion: dict[str, Any] = field(default_factory=dict)
+    mesh_source_sha256: str | None = None
+    mesh_source_availability: str | None = None
+    mesh_uv_status: str | None = None
+    mesh_report_href: str | None = None
+    mesh_report_sha256: str | None = None
 
 
 def parse_gate_rows(
@@ -719,6 +724,11 @@ def collect_product(
             )
         )
 
+    mesh_source_sha256 = None
+    mesh_source_availability = None
+    mesh_uv_status = None
+    mesh_report_href = None
+    mesh_report_sha256 = None
     mesh_report = workspace / "Previews/Mesh/mesh-showcase.json"
     if mesh_report.is_file():
         mesh = load_json(mesh_report, {})
@@ -737,6 +747,11 @@ def collect_product(
             and re.fullmatch(r"[0-9a-f]{64}", mesh["sourceSha256"]) is not None
         )
         if source_file_matches or local_source_hash_bound:
+            mesh_source_sha256 = mesh["sourceSha256"]
+            mesh_source_availability = mesh["sourceAvailability"]
+            mesh_uv_status = mesh.get("uvStatus")
+            mesh_report_href = relative_href(mesh_report, output_dir)
+            mesh_report_sha256 = digest(mesh_report)
             for record in mesh.get("records", []):
                 target = (root / record["path"]).resolve()
                 if workspace.resolve() not in target.parents or target.suffix != ".svg":
@@ -815,7 +830,24 @@ def collect_product(
             *parse_evidence_rows(manifest, workspace, output_dir),
             *quality_evidence,
             *improvement_evidence,
+            *(
+                [
+                    Evidence(
+                        label="Mesh source and diagram hashes",
+                        status="UNVERIFIED",
+                        href=mesh_report_href,
+                        sha256=mesh_report_sha256,
+                    )
+                ]
+                if mesh_report_href and mesh_report_sha256
+                else []
+            ),
         ],
+        mesh_source_sha256=mesh_source_sha256,
+        mesh_source_availability=mesh_source_availability,
+        mesh_uv_status=mesh_uv_status,
+        mesh_report_href=mesh_report_href,
+        mesh_report_sha256=mesh_report_sha256,
     )
 
 

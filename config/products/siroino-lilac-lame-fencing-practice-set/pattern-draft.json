@@ -2370,6 +2370,61 @@
       "garmentSide": "back",
       "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
       "constructionStatus": "PROVISIONAL_MEASURED_NEUTRAL_WAISTBAND"
+    },
+    {
+      "pieceId": "shorts-gusset",
+      "partId": "fitted-short",
+      "boundary": [
+        [
+          0.0,
+          0.0794512429103535
+        ],
+        [
+          0.0794512429103535,
+          0.0
+        ],
+        [
+          0.0,
+          -0.0794512429103535
+        ],
+        [
+          -0.0794512429103535,
+          0.0
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.0,
+      "edges": [
+        {
+          "edgeId": "front-right",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "right-back",
+          "startVertex": 1,
+          "endVertex": 2,
+          "role": "seam"
+        },
+        {
+          "edgeId": "back-left",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "seam"
+        },
+        {
+          "edgeId": "left-front",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "garmentFacing": "gusset",
+      "wearerSide": "center",
+      "measurementStatus": "UNMEASURED_GUSSET_COVERAGE_HYPOTHESIS"
     }
   ],
   "method": {
@@ -2390,13 +2445,14 @@
     },
     {
       "item": "shorts rise, crotch, thigh sections, and shape-key response",
-      "status": "shaped-prototype-unverified",
-      "decision": "The four matched shorts panels retain connected seam topology and extend the inner center rise by 50 mm in this prototype trial. It is not a separate gusset panel and does not establish coverage, fit, opacity, deformation or Shape Key response."
+      "status": "separate-gusset-prototype-unverified",
+      "decision": "The four matched shorts panels retain their current rise geometry and add one separate center gusset with four equal edges matched to the drafted lower rise edge. This is a construction and coverage hypothesis, not resolved by the reference; body coverage, deformation, penetration, fabric behavior, and Shape Key response remain unmeasured and unapproved."
     },
     {
       "item": "jacket plastron, elbow quilting, piping, and back tab",
       "status": "partially-represented",
       "decision": "The two front contours include the diagonal overlap silhouette; elbow quilting, lavender trim, and back adjustment tab remain separate surface/edge details outside this panel graph."
     }
-  ]
+  ],
+  "rationale": "Add a separate four-edge center gusset as an explicit construction hypothesis for the fitted shorts. Its four straight sides are each matched to the currently drafted lower crotch-rise edge length; the reference does not resolve gusset shape, grain, ease, stretch, opacity, or fit."
 }

@@ -873,21 +873,6 @@
       "easingRatio": 1.0
     },
     {
-      "stitchId": "shorts-front-crotch-lower",
-      "first": {
-        "pieceId": "shorts-front-left",
-        "edgeId": "crotch-rise-lower"
-      },
-      "second": {
-        "pieceId": "shorts-front-right",
-        "edgeId": "crotch-rise-lower"
-      },
-      "type": "plain",
-      "direction": "same",
-      "endpointMapping": "start-to-start",
-      "easingRatio": 1.0
-    },
-    {
       "stitchId": "shorts-back-crotch-upper",
       "first": {
         "pieceId": "shorts-back-left",
@@ -903,17 +888,62 @@
       "easingRatio": 1.0
     },
     {
-      "stitchId": "shorts-back-crotch-lower",
+      "stitchId": "shorts-front-gusset-left",
+      "first": {
+        "pieceId": "shorts-front-left",
+        "edgeId": "crotch-rise-lower"
+      },
+      "second": {
+        "pieceId": "shorts-gusset",
+        "edgeId": "left-front"
+      },
+      "type": "plain",
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "easingRatio": 1.0
+    },
+    {
+      "stitchId": "shorts-front-gusset-right",
+      "first": {
+        "pieceId": "shorts-front-right",
+        "edgeId": "crotch-rise-lower"
+      },
+      "second": {
+        "pieceId": "shorts-gusset",
+        "edgeId": "front-right"
+      },
+      "type": "plain",
+      "direction": "same",
+      "endpointMapping": "start-to-start",
+      "easingRatio": 1.0
+    },
+    {
+      "stitchId": "shorts-back-gusset-right",
+      "first": {
+        "pieceId": "shorts-back-right",
+        "edgeId": "crotch-rise-lower"
+      },
+      "second": {
+        "pieceId": "shorts-gusset",
+        "edgeId": "right-back"
+      },
+      "type": "plain",
+      "direction": "same",
+      "endpointMapping": "start-to-end",
+      "easingRatio": 1.0
+    },
+    {
+      "stitchId": "shorts-back-gusset-left",
       "first": {
         "pieceId": "shorts-back-left",
         "edgeId": "crotch-rise-lower"
       },
       "second": {
-        "pieceId": "shorts-back-right",
-        "edgeId": "crotch-rise-lower"
+        "pieceId": "shorts-gusset",
+        "edgeId": "back-left"
       },
       "type": "plain",
-      "direction": "same",
+      "direction": "reversed",
       "endpointMapping": "start-to-start",
       "easingRatio": 1.0
     }

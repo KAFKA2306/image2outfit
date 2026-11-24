@@ -1289,7 +1289,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  0.00002832724526524548
+                  2.832724526524548e-05
                 ],
                 [
                   0.4660173002481461,
@@ -1619,7 +1619,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -0.00005813505500555042
+                  -5.813505500555042e-05
                 ],
                 [
                   0.4549046622924507,
@@ -2599,7 +2599,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  0.00009349594637751571
+                  9.349594637751571e-05
                 ],
                 [
                   0.34305510099232195,
@@ -2734,7 +2734,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  0.000023979127407073968
+                  2.3979127407073968e-05
                 ],
                 [
                   0.3436575804427266,
@@ -5124,7 +5124,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  0.00002821132168173788
+                  2.821132168173788e-05
                 ],
                 [
                   -0.4660175991356373,
@@ -5454,7 +5454,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -0.00005818757042288787
+                  -5.818757042288787e-05
                 ],
                 [
                   -0.45490475164726374,
@@ -6434,7 +6434,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  0.00009340183436870597
+                  9.340183436870597e-05
                 ],
                 [
                   -0.343055190294981,
@@ -6569,7 +6569,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  0.000024023622274398863
+                  2.4023622274398863e-05
                 ],
                 [
                   -0.3436576402038336,
@@ -8925,6 +8925,19 @@
         ],
         "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
       }
+    },
+    "shorts-gusset": {
+      "rotationDegreesXYZ": [
+        90,
+        0,
+        0
+      ],
+      "translationM": [
+        0.0,
+        0.599578,
+        0.0
+      ],
+      "evidenceBoundary": "Standalone gusset plane is rotated into an XY crotch-covering surface around the measured 0.599578 m pelvis/leg anchor. This transform is only a prototype placement hypothesis; it has not been reviewed for 3D coverage, strain, penetration, pose deformation, shape keys, or fit."
     }
   },
   "placementEvidence": [
@@ -9040,7 +9053,8 @@
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
-        "shorts-back-right"
+        "shorts-back-right",
+        "shorts-gusset"
       ],
       "bodyMeshNamePrefix": "SiroinoSotai_PC",
       "fadeStartZM": 0.38,
@@ -9053,14 +9067,14 @@
       "outerPieceId": "__none__",
       "outerLayerOffsetM": 0,
       "maximumBlendWeight": 0.85,
-      "evidenceBoundary": "Prototype shorts tracking trial based on the prior current-source skin export: four shorts panels averaged 20 mm nearest-body distance and peaked at 58.2 mm. Move the sewn panels toward the evaluated Neutral target surface with a bounded 0.85 blend and 4 mm normal offset. Shared sewn vertices remain shared and receive one displacement; this does not validate fit, opacity, pose coverage, penetration, strain, Shape Keys or runtime."
+      "evidenceBoundary": "Prototype shorts tracking hypothesis based on prior weighted mesh diagnostics. Apply bounded nearest-body projection to the four rise panels and the new center gusset with a 4 mm normal offset. Shared sewn vertices move once. This does not validate coverage, fit, opacity, pose deformation, penetration, strain, Shape Keys, or runtime."
     }
   },
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",
     "leftAxis": "GarmentCode +X = Blender +X",
-    "method": "Signed half-leg to quarter-pelvis placement follows measured Neutral anchors. The four-panel pattern now extends its provisional hem 50 mm toward the 0.4144 m knee landmark; this is a coverage hypothesis only, with no gusset or fit acceptance.",
-    "evidenceBoundary": "Neutral avatar landmark placement and provisional contour geometry only. The 50 mm hem extension has not yet been rendered because the cloth-stage input evidence is stale. Gusset, garment ease, penetrations, crouch/sit coverage and Shape Key response remain unmeasured."
+    "method": "Signed half-leg to quarter-pelvis placement follows measured Neutral anchors. The 50 mm inner center-rise extension remains provisional; a separate, edge-length-matched four-edge center gusset is now added as a construction hypothesis. Neither change is reference-verified or fit-approved.",
+    "evidenceBoundary": "Neutral avatar landmark placement only. Gusset shape, grain, ease, cloth response, crouch/sit coverage, penetration, and Shape Key response remain unmeasured."
   },
   "skirtEnvelopePlacement": {
     "method": "measured-horizontal-body-envelope-minimum-clearance",
@@ -9120,7 +9134,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651e-9,
+      -2.053701209092651e-09,
       -0.0093428585678339,
       1.0351301431655884
     ],
