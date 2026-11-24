@@ -12,14 +12,48 @@ import argparse
 import hashlib
 import json
 import math
+import os
+import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
+from typing import Any
 
-import bmesh
-import bpy
+try:
+    import bmesh
+    import bpy
+except ImportError:
+    bmesh = None
+    bpy = None
 
 
 ROOT = Path(__file__).resolve().parents[1]
+HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
+HEX40_RE = re.compile(r"^[0-9a-f]{40}$")
+CONTENT_HASH_SUFFIX_RE = re.compile(r"-[0-9a-f]{16}$")
+PROSE_ONLY_POSE_KEYS = frozenset({"method", "evidenceBoundary", "observation", "reason"})
+GLOBAL_ASSEMBLY_POSE_KEYS = frozenset(
+    {
+        "schemaVersion",
+        "productId",
+        "status",
+        "coordinateSystem",
+        "targetSourceSha256",
+        "measurementEvidencePath",
+        "measurementEvidenceSha256",
+    }
+)
+GLOBAL_PATTERN_KEYS = frozenset(
+    {
+        "schemaVersion",
+        "productId",
+        "units",
+        "coordinateSystem",
+        "sourceReference",
+        "measurementBasis",
+    }
+)
 
 COMPONENTS: dict[str, tuple[str, ...]] = {
     "siroino-cyber-kawaii-large": (
@@ -58,12 +92,21 @@ FRAME_END = {
 }
 
 
-def parse_args() -> argparse.Namespace:
-    values = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    if argv is not None:
+        values = list(argv)
+    elif "--" in sys.argv:
+        values = sys.argv[sys.argv.index("--") + 1 :]
+    elif bpy is None:
+        values = sys.argv[1:]
+    else:
+        values = []
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", type=Path, required=True)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--prototype", action="store_true")
+    parser.add_argument("--rebind-bending-component")
+    parser.add_argument("--baseline-revision")
     return parser.parse_args(values)
 
 
@@ -74,10 +117,25 @@ def read_json(path: Path) -> dict[str, object]:
     return value
 
 
-def repo_path(value: str | Path) -> Path:
+def parse_json_bytes(raw: bytes, label: str) -> dict[str, object]:
+    try:
+        value = json.loads(raw.decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid JSON in {label}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"expected JSON object: {label}")
+    return value
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def repo_path(value: str | Path, *, root: Path | None = None) -> Path:
+    base = (root or ROOT).resolve()
     path = Path(value)
-    resolved = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
-    if resolved != ROOT and ROOT not in resolved.parents:
+    resolved = path.resolve() if path.is_absolute() else (base / path).resolve()
+    if resolved != base and base not in resolved.parents:
         raise ValueError(f"path escapes repository: {value}")
     return resolved
 
@@ -87,6 +145,24 @@ def write_json(path: Path, value: dict[str, object]) -> None:
     path.write_text(
         json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+
+
+def atomic_write_bytes(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent)
+    )
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
+        if tmp_path.exists():
+            tmp_path.unlink(missing_ok=True)
+        raise
 
 
 def mesh_hash(obj: bpy.types.Object, *, evaluated: bool = False) -> str:
@@ -410,7 +486,8 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
         if lo is None:
             scale = rows[0 if z < rows[0]["zM"] else -1]["radialRestScale"]
         else:
-            a, b = rows[lo], rows[lo+1]; t = (z-a["zM"])/(b["zM"]-a["zM"])
+            a, b = rows[lo], rows[lo + 1]
+            t = (z - a["zM"]) / (b["zM"] - a["zM"])
             scale = (1-t)*a["radialRestScale"]+t*b["radialRestScale"]
         from mathutils import Vector
         vertex.co = inverse @ Vector((origin[0]+(x-origin[0])*scale,
@@ -435,8 +512,770 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
             "grantsFitAcceptance": False, "evidenceBoundary": declaration["evidenceBoundary"]}
 
 
+def _require_blender() -> None:
+    if bpy is None or bmesh is None:
+        raise RuntimeError(
+            "Blender runtime (bpy/bmesh) is required for cloth simulation"
+        )
+
+
+def _require_non_empty_str(value: object, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label} must be a non-empty string")
+    return value.strip()
+
+
+def validate_component_bending_evidence(
+    job: dict[str, Any],
+    declared: dict[str, Any],
+    *,
+    frame_end: int,
+    blender_version: str | None,
+    bending_model: str | None,
+    stiffness_min: float,
+    stiffness_max: float,
+    root: Path | None = None,
+) -> tuple[float, dict[str, Any]]:
+    if not isinstance(declared, dict):
+        raise ValueError("Bending declaration must be a JSON object")
+    value = declared.get("stiffness")
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+    ):
+        raise ValueError("Finite numeric bending stiffness is required")
+    if not stiffness_min <= value <= stiffness_max:
+        raise ValueError("Declared bending stiffness exceeds native Blender limits")
+    evidence_rel = _require_non_empty_str(declared.get("evidencePath"), "evidencePath")
+    evidence_sha = _require_non_empty_str(
+        declared.get("evidenceSha256"), "evidenceSha256"
+    )
+    if not HEX64_RE.fullmatch(evidence_sha):
+        raise ValueError("Bending comparison evidence sha256 must be 64 lowercase hex")
+    _require_non_empty_str(declared.get("evidenceBoundary"), "evidenceBoundary")
+    evidence_path = repo_path(evidence_rel, root=root)
+    if not evidence_path.is_file():
+        raise ValueError(f"Bending comparison evidence file is missing: {evidence_rel}")
+    if sha256_bytes(evidence_path.read_bytes()) != evidence_sha:
+        raise ValueError("Bending comparison evidence hash mismatch")
+    evidence = read_json(evidence_path)
+    if (
+        evidence.get("productId") != job.get("id")
+        or (
+            blender_version is not None
+            and evidence.get("blenderVersion") != blender_version
+        )
+        or evidence.get("bendingStiffness") != value
+        or (
+            bending_model is not None
+            and evidence.get("bendingModel") != bending_model
+        )
+        or evidence.get("frameEnd") != frame_end
+        or evidence.get("cacheBaked") is not True
+    ):
+        raise ValueError("Bending comparison is incompatible with this solve")
+    pipeline = job.get("garmentPipeline")
+    if not isinstance(pipeline, dict):
+        raise ValueError("job.garmentPipeline is required")
+    for key, rel_path in (
+        ("assemblyPoseSha256", pipeline.get("assemblyPosePath")),
+        ("patternSha256", pipeline.get("patternContractPath")),
+        ("targetSourceSha256", job.get("targetSourcePath")),
+    ):
+        rel = _require_non_empty_str(rel_path, key)
+        resolved = repo_path(rel, root=root)
+        if not resolved.is_file():
+            raise ValueError(f"Required bending input file is missing: {rel}")
+        if evidence.get(key) != sha256_bytes(resolved.read_bytes()):
+            raise ValueError("Bending comparison inputs are stale: " + key)
+    return float(value), evidence
+
+
+def _resolve_git_commit(baseline_revision: str, repo_root: Path) -> str:
+    rev = _require_non_empty_str(baseline_revision, "baseline-revision")
+    if rev.startswith("-"):
+        raise ValueError(f"Invalid baseline git revision: {baseline_revision}")
+    proc = subprocess.run(
+        ["git", "rev-parse", "--verify", "--end-of-options", f"{rev}^{{commit}}"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    commit = proc.stdout.strip()
+    if proc.returncode != 0 or not HEX40_RE.fullmatch(commit):
+        detail = proc.stderr.strip() or f"exit code {proc.returncode}"
+        raise ValueError(
+            f"Invalid baseline git revision '{baseline_revision}': {detail}"
+        )
+    return commit
+
+
+def _read_git_file_bytes(commit: str, rel_path: str, repo_root: Path) -> bytes:
+    posix_rel = rel_path.replace("\\", "/")
+    proc = subprocess.run(
+        ["git", "show", f"{commit}:{posix_rel}"],
+        cwd=repo_root,
+        capture_output=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        detail = proc.stderr.decode("utf-8", errors="replace").strip()
+        raise ValueError(
+            f"Baseline revision {commit} is missing '{posix_rel}': {detail}"
+        )
+    return proc.stdout
+
+
+def _index_pattern_pieces(pattern: dict[str, Any], label: str) -> dict[str, Any]:
+    pieces = pattern.get("pieces")
+    if not isinstance(pieces, list) or not pieces:
+        raise ValueError(f"Pattern pieces list is missing or empty in {label}")
+    indexed: dict[str, Any] = {}
+    for item in pieces:
+        if not isinstance(item, dict):
+            raise ValueError(f"Pattern piece must be an object in {label}")
+        pid = _require_non_empty_str(item.get("pieceId"), f"{label}.pieceId")
+        if pid in indexed:
+            raise ValueError(f"Duplicate pieceId '{pid}' in {label}")
+        indexed[pid] = item
+    return indexed
+
+
+def _extract_component_stitches(
+    stitch_doc: dict[str, Any], piece_set: set[str], label: str
+) -> tuple[list[str], set[str]]:
+    stitches = stitch_doc.get("stitches")
+    if not isinstance(stitches, list):
+        raise ValueError(f"Stitch graph 'stitches' must be a list in {label}")
+    touched: list[str] = []
+    neighbors: set[str] = set()
+    for entry in stitches:
+        if not isinstance(entry, dict):
+            raise ValueError(f"Stitch entry must be an object in {label}")
+        first = entry.get("first")
+        second = entry.get("second")
+        if not isinstance(first, dict) or not isinstance(second, dict):
+            raise ValueError(f"Stitch endpoints must be objects in {label}")
+        p1 = _require_non_empty_str(first.get("pieceId"), f"{label}.first.pieceId")
+        p2 = _require_non_empty_str(second.get("pieceId"), f"{label}.second.pieceId")
+        if p1 in piece_set or p2 in piece_set:
+            touched.append(json.dumps(entry, sort_keys=True, separators=(",", ":")))
+            neighbors.add(p1)
+            neighbors.add(p2)
+    touched.sort()
+    return touched, neighbors
+
+
+def _validate_cloth_policy_invariance(
+    baseline_construction: dict[str, Any],
+    current_construction: dict[str, Any],
+    component: str,
+) -> None:
+    base_policy = baseline_construction.get("clothSimulation")
+    cur_policy = current_construction.get("clothSimulation")
+    if not isinstance(base_policy, dict) or not isinstance(cur_policy, dict):
+        raise ValueError("clothSimulation policy is required in baseline and current construction")
+    if base_policy.get("prototypeFrameEnd") != cur_policy.get("prototypeFrameEnd"):
+        raise ValueError(
+            "Cloth prototypeFrameEnd changed since baseline; remeasure bending evidence"
+        )
+    base_groups = base_policy.get("prototypePanelGroups")
+    cur_groups = cur_policy.get("prototypePanelGroups")
+    if not isinstance(base_groups, dict) or base_groups.get(component) != cur_groups.get(
+        component
+    ):
+        raise ValueError(
+            f"Cloth prototypePanelGroups changed for '{component}'; remeasure bending evidence"
+        )
+    base_bending = base_policy.get("prototypeComponentBending")
+    cur_bending = cur_policy.get("prototypeComponentBending")
+    if (
+        not isinstance(base_bending, dict)
+        or not isinstance(base_bending.get(component), dict)
+        or base_bending[component].get("stiffness")
+        != cur_bending[component].get("stiffness")
+    ):
+        raise ValueError(
+            f"Declared bending stiffness changed for '{component}'; remeasure bending evidence"
+        )
+    base_rest = (
+        base_policy.get("prototypeRestShape", {}).get(component)
+        if isinstance(base_policy.get("prototypeRestShape"), dict)
+        else None
+    )
+    cur_rest = (
+        cur_policy.get("prototypeRestShape", {}).get(component)
+        if isinstance(cur_policy.get("prototypeRestShape"), dict)
+        else None
+    )
+    if base_rest != cur_rest:
+        raise ValueError(
+            f"Cloth prototypeRestShape changed for '{component}'; remeasure bending evidence"
+        )
+    if base_policy.get("prototypeWaistPinBoundary") != cur_policy.get(
+        "prototypeWaistPinBoundary"
+    ) or base_policy.get("prototypeWaistPinUpperFraction") != cur_policy.get(
+        "prototypeWaistPinUpperFraction"
+    ):
+        raise ValueError(
+            "Cloth waist pin policy changed since baseline; remeasure bending evidence"
+        )
+
+
+def _block_referenced_pieces(block: dict[str, Any]) -> set[str] | None:
+    piece_ids = block.get("pieceIds")
+    if (
+        not isinstance(piece_ids, list)
+        or not piece_ids
+        or not all(isinstance(item, str) and item for item in piece_ids)
+    ):
+        return None
+    referenced = set(piece_ids)
+    for extra_key in ("seamContinuationPieceIds", "preserveSharedPieceIds"):
+        extra = block.get(extra_key)
+        if isinstance(extra, list):
+            referenced.update(item for item in extra if isinstance(item, str))
+    return referenced
+
+
+def _validate_assembly_pose_invariance(
+    baseline_pose: dict[str, Any],
+    current_pose: dict[str, Any],
+    protected_piece_ids: set[str],
+    component: str,
+) -> tuple[list[str], list[str]]:
+    base_poses = baseline_pose.get("poses")
+    cur_poses = current_pose.get("poses")
+    if not isinstance(base_poses, dict) or not isinstance(cur_poses, dict):
+        raise ValueError("Assembly pose 'poses' must be an object")
+    for pid in sorted(protected_piece_ids):
+        if pid not in base_poses or pid not in cur_poses:
+            raise ValueError(
+                f"Assembly pose is missing component-relevant piece '{pid}'"
+            )
+        if base_poses[pid] != cur_poses[pid]:
+            raise ValueError(
+                f"Assembly pose changed for component-relevant piece '{pid}'; "
+                "remeasure bending evidence instead of rebinding"
+            )
+    changed_pose_pieces = sorted(
+        pid
+        for pid in set(base_poses) | set(cur_poses)
+        if base_poses.get(pid) != cur_poses.get(pid)
+    )
+    if set(baseline_pose.keys()) != set(current_pose.keys()):
+        raise ValueError(
+            "Assembly pose top-level keys changed; remeasure bending evidence instead of rebinding"
+        )
+    known_pieces = set(base_poses) | set(cur_poses)
+    changed_blocks: list[str] = []
+    protected_tokens = set(protected_piece_ids) | {component}
+    for key in sorted(k for k in baseline_pose if k != "poses"):
+        base_val = baseline_pose[key]
+        cur_val = current_pose[key]
+        if base_val == cur_val:
+            continue
+        if key in GLOBAL_ASSEMBLY_POSE_KEYS:
+            raise ValueError(
+                f"Assembly pose global key '{key}' changed; "
+                "remeasure bending evidence instead of rebinding"
+            )
+        if isinstance(base_val, dict) and isinstance(cur_val, dict):
+            base_refs = _block_referenced_pieces(base_val)
+            cur_refs = _block_referenced_pieces(cur_val)
+            if base_refs is not None and cur_refs is not None:
+                if (base_refs | cur_refs).isdisjoint(protected_piece_ids):
+                    changed_blocks.append(key)
+                    continue
+                raise ValueError(
+                    f"Assembly pose block '{key}' affects component-relevant pieces; "
+                    "remeasure bending evidence instead of rebinding"
+                )
+            if (
+                base_val
+                and cur_val
+                and set(base_val).issubset(known_pieces)
+                and set(cur_val).issubset(known_pieces)
+            ):
+                changed_subkeys = {
+                    sub
+                    for sub in set(base_val) | set(cur_val)
+                    if base_val.get(sub) != cur_val.get(sub)
+                }
+                if changed_subkeys.isdisjoint(protected_piece_ids):
+                    changed_blocks.append(key)
+                    continue
+                raise ValueError(
+                    f"Assembly pose per-piece block '{key}' changed component-relevant pieces; "
+                    "remeasure bending evidence instead of rebinding"
+                )
+            if set(base_val.keys()) == set(cur_val.keys()):
+                changed_subkeys = {
+                    sub for sub in base_val if base_val[sub] != cur_val[sub]
+                }
+                blob = key + "\n" + json.dumps(base_val) + "\n" + json.dumps(cur_val)
+                if (
+                    changed_subkeys
+                    and changed_subkeys.issubset(PROSE_ONLY_POSE_KEYS)
+                    and all(
+                        isinstance(base_val[sub], str) and isinstance(cur_val[sub], str)
+                        for sub in changed_subkeys
+                    )
+                    and not any(token in blob for token in protected_tokens)
+                ):
+                    changed_blocks.append(key)
+                    continue
+        raise ValueError(
+            f"Assembly pose block '{key}' changed non-prose or component-relevant data; "
+            "remeasure bending evidence instead of rebinding"
+        )
+    return changed_pose_pieces, changed_blocks
+
+
+def _verify_component_mesh_in_blender(
+    job: dict[str, Any],
+    groups: dict[str, list[str]],
+    component: str,
+    old_evidence: dict[str, Any],
+    repo_root: Path,
+) -> bool:
+    if bpy is None:
+        return False
+    blend_rel = job.get("blendPath")
+    if not isinstance(blend_rel, str) or not blend_rel.strip():
+        return False
+    blend_path = repo_path(blend_rel, root=repo_root)
+    if not blend_path.is_file():
+        raise ValueError(f"Prototype .blend file is missing: {blend_rel}")
+    bpy.ops.wm.open_mainfile(filepath=str(blend_path), load_ui=False)
+    original = bpy.data.objects.get(str(job["id"]))
+    if original is None or original.type != "MESH":
+        raise ValueError("canonical sewn prototype is missing")
+    pieces = json.loads(original["canonicalPieceIds"])
+    owners = original.data.attributes["canonical_piece_index"]
+    faces = [list(face.vertices) for face in original.data.polygons]
+    group = groups[component]
+    indices = [i for i, owner in enumerate(owners.data) if pieces[owner.value] in group]
+    if not indices:
+        raise ValueError(f"Cloth component '{component}' has no faces in .blend")
+    ids = sorted({v for i in indices for v in faces[i]})
+    remap = {value: index for index, value in enumerate(ids)}
+    data = bpy.data.meshes.new(component + "-rebind-check")
+    data.from_pydata(
+        [original.data.vertices[i].co[:] for i in ids],
+        [],
+        [[remap[v] for v in faces[i]] for i in indices],
+    )
+    data.update()
+    probe = bpy.data.objects.new(component + "-rebind-check", data)
+    bpy.context.collection.objects.link(probe)
+    probe.matrix_world = original.matrix_world.copy()
+    try:
+        actual_mesh_sha = mesh_hash(probe)
+    finally:
+        bpy.data.objects.remove(probe, do_unlink=True)
+        bpy.data.meshes.remove(data, do_unlink=True)
+    expected_mesh_sha = old_evidence.get("sourceComponentMeshSha256") or old_evidence.get(
+        "sourceSkirtMeshSha256"
+    )
+    if expected_mesh_sha is not None and actual_mesh_sha != expected_mesh_sha:
+        raise ValueError(
+            f"Blender component mesh changed for '{component}'; "
+            "remeasure bending evidence instead of rebinding"
+        )
+    return True
+
+
+def verify_component_bending_rebind_preconditions(
+    job: dict[str, Any],
+    component: str,
+    baseline_revision: str,
+    *,
+    root: Path | None = None,
+) -> dict[str, Any]:
+    base_root = (root or ROOT).resolve()
+    comp = _require_non_empty_str(component, "rebind-bending-component")
+    rev_input = _require_non_empty_str(baseline_revision, "baseline-revision")
+    product_id = _require_non_empty_str(job.get("id"), "job.id")
+    pipeline = job.get("garmentPipeline")
+    if not isinstance(pipeline, dict):
+        raise ValueError("job.garmentPipeline is required")
+
+    construction_rel = _require_non_empty_str(
+        pipeline.get("constructionPath"), "garmentPipeline.constructionPath"
+    )
+    assembly_pose_rel = _require_non_empty_str(
+        pipeline.get("assemblyPosePath"), "garmentPipeline.assemblyPosePath"
+    )
+    pattern_rel = _require_non_empty_str(
+        pipeline.get("patternContractPath"), "garmentPipeline.patternContractPath"
+    )
+    target_rel = _require_non_empty_str(
+        job.get("targetSourcePath"), "job.targetSourcePath"
+    )
+    stitch_rel = pipeline.get("stitchGraphPath")
+    if stitch_rel is not None:
+        stitch_rel = _require_non_empty_str(stitch_rel, "garmentPipeline.stitchGraphPath")
+
+    construction_path = repo_path(construction_rel, root=base_root)
+    assembly_pose_path = repo_path(assembly_pose_rel, root=base_root)
+    pattern_path = repo_path(pattern_rel, root=base_root)
+    target_path = repo_path(target_rel, root=base_root)
+    for label, path in (
+        ("constructionPath", construction_path),
+        ("assemblyPosePath", assembly_pose_path),
+        ("patternContractPath", pattern_path),
+        ("targetSourcePath", target_path),
+    ):
+        if not path.is_file():
+            raise ValueError(f"Required input file is missing ({label}): {path}")
+
+    current_construction_bytes = construction_path.read_bytes()
+    current_construction = parse_json_bytes(current_construction_bytes, construction_rel)
+    policy = current_construction.get("clothSimulation")
+    if not isinstance(policy, dict):
+        raise ValueError("construction.clothSimulation is required")
+    groups = policy.get("prototypePanelGroups")
+    bending = policy.get("prototypeComponentBending")
+    if not isinstance(groups, dict) or not isinstance(bending, dict):
+        raise ValueError(
+            "construction.clothSimulation requires prototypePanelGroups and prototypeComponentBending"
+        )
+    if comp not in groups or comp not in bending:
+        raise ValueError(f"Unknown or undeclared bending component: {comp}")
+    piece_ids = groups[comp]
+    if (
+        not isinstance(piece_ids, list)
+        or not piece_ids
+        or not all(isinstance(pid, str) and pid for pid in piece_ids)
+        or len(set(piece_ids)) != len(piece_ids)
+    ):
+        raise ValueError(f"Invalid prototypePanelGroups declaration for '{comp}'")
+    frame_end = policy.get("prototypeFrameEnd")
+    if isinstance(frame_end, bool) or not isinstance(frame_end, int) or not 2 <= frame_end <= 120:
+        raise ValueError("bounded prototype frame range is required")
+
+    declared = bending[comp]
+    if not isinstance(declared, dict):
+        raise ValueError(f"Bending declaration for '{comp}' must be an object")
+    stiffness = declared.get("stiffness")
+    if (
+        isinstance(stiffness, bool)
+        or not isinstance(stiffness, (int, float))
+        or not math.isfinite(stiffness)
+        or not 0 <= stiffness <= 10000
+    ):
+        raise ValueError("Finite numeric bending stiffness in [0, 10000] is required")
+    old_evidence_rel = _require_non_empty_str(
+        declared.get("evidencePath"), "evidencePath"
+    )
+    old_evidence_sha = _require_non_empty_str(
+        declared.get("evidenceSha256"), "evidenceSha256"
+    )
+    if not HEX64_RE.fullmatch(old_evidence_sha):
+        raise ValueError("Bending comparison evidence sha256 must be 64 lowercase hex")
+    _require_non_empty_str(declared.get("evidenceBoundary"), "evidenceBoundary")
+
+    old_evidence_path = repo_path(old_evidence_rel, root=base_root)
+    if not old_evidence_path.is_file():
+        raise ValueError(
+            f"Bending comparison evidence file is missing: {old_evidence_rel}"
+        )
+    old_evidence_bytes = old_evidence_path.read_bytes()
+    if sha256_bytes(old_evidence_bytes) != old_evidence_sha:
+        raise ValueError("Bending comparison evidence hash mismatch")
+    old_evidence = parse_json_bytes(old_evidence_bytes, old_evidence_rel)
+    if (
+        old_evidence.get("productId") != product_id
+        or old_evidence.get("bendingStiffness") != stiffness
+        or old_evidence.get("frameEnd") != frame_end
+        or old_evidence.get("cacheBaked") is not True
+        or not isinstance(old_evidence.get("blenderVersion"), str)
+        or not old_evidence["blenderVersion"]
+        or not isinstance(old_evidence.get("bendingModel"), str)
+        or not old_evidence["bendingModel"]
+    ):
+        raise ValueError("Bending comparison is incompatible with this solve")
+    if bpy is not None and old_evidence.get("blenderVersion") != bpy.app.version_string:
+        raise ValueError("Bending comparison is incompatible with this solve")
+
+    resolved_commit = _resolve_git_commit(rev_input, base_root)
+    baseline_pose_bytes = _read_git_file_bytes(
+        resolved_commit, assembly_pose_rel, base_root
+    )
+    baseline_pattern_bytes = _read_git_file_bytes(
+        resolved_commit, pattern_rel, base_root
+    )
+    baseline_construction_bytes = _read_git_file_bytes(
+        resolved_commit, construction_rel, base_root
+    )
+
+    baseline_pose_sha = sha256_bytes(baseline_pose_bytes)
+    baseline_pattern_sha = sha256_bytes(baseline_pattern_bytes)
+    current_pose_bytes = assembly_pose_path.read_bytes()
+    current_pattern_bytes = pattern_path.read_bytes()
+    current_target_bytes = target_path.read_bytes()
+    current_pose_sha = sha256_bytes(current_pose_bytes)
+    current_pattern_sha = sha256_bytes(current_pattern_bytes)
+    current_target_sha = sha256_bytes(current_target_bytes)
+
+    if old_evidence.get("assemblyPoseSha256") != baseline_pose_sha:
+        raise ValueError(
+            "Baseline revision does not match existing bending comparison evidence: assemblyPoseSha256"
+        )
+    if old_evidence.get("patternSha256") != baseline_pattern_sha:
+        raise ValueError(
+            "Baseline revision does not match existing bending comparison evidence: patternSha256"
+        )
+    if old_evidence.get("targetSourceSha256") != current_target_sha:
+        raise ValueError(
+            "Target source changed; bending comparison must be remeasured"
+        )
+
+    baseline_construction = parse_json_bytes(
+        baseline_construction_bytes, f"{resolved_commit}:{construction_rel}"
+    )
+    _validate_cloth_policy_invariance(baseline_construction, current_construction, comp)
+
+    protected_piece_ids = set(piece_ids)
+    if stitch_rel is not None:
+        stitch_path = repo_path(stitch_rel, root=base_root)
+        if not stitch_path.is_file():
+            raise ValueError(f"Required input file is missing (stitchGraphPath): {stitch_path}")
+        baseline_stitch_bytes = _read_git_file_bytes(
+            resolved_commit, stitch_rel, base_root
+        )
+        baseline_stitch = parse_json_bytes(
+            baseline_stitch_bytes, f"{resolved_commit}:{stitch_rel}"
+        )
+        current_stitch = parse_json_bytes(stitch_path.read_bytes(), stitch_rel)
+        base_touched, base_neighbors = _extract_component_stitches(
+            baseline_stitch, set(piece_ids), f"{resolved_commit}:{stitch_rel}"
+        )
+        cur_touched, cur_neighbors = _extract_component_stitches(
+            current_stitch, set(piece_ids), stitch_rel
+        )
+        if base_touched != cur_touched:
+            raise ValueError(
+                f"Stitch graph changed for '{comp}'; remeasure bending evidence instead of rebinding"
+            )
+        protected_piece_ids.update(base_neighbors | cur_neighbors)
+
+    baseline_pattern = parse_json_bytes(
+        baseline_pattern_bytes, f"{resolved_commit}:{pattern_rel}"
+    )
+    current_pattern = parse_json_bytes(current_pattern_bytes, pattern_rel)
+    for key in GLOBAL_PATTERN_KEYS:
+        if baseline_pattern.get(key) != current_pattern.get(key):
+            raise ValueError(
+                f"Pattern global field '{key}' changed; remeasure bending evidence instead of rebinding"
+            )
+    base_pieces = _index_pattern_pieces(
+        baseline_pattern, f"{resolved_commit}:{pattern_rel}"
+    )
+    cur_pieces = _index_pattern_pieces(current_pattern, pattern_rel)
+    for pid in sorted(protected_piece_ids):
+        if pid not in base_pieces or pid not in cur_pieces:
+            raise ValueError(
+                f"Pattern is missing component-relevant piece '{pid}'"
+            )
+        if base_pieces[pid] != cur_pieces[pid]:
+            raise ValueError(
+                f"Pattern changed for component-relevant piece '{pid}'; "
+                "remeasure bending evidence instead of rebinding"
+            )
+    changed_pattern_pieces = sorted(
+        pid
+        for pid in set(base_pieces) | set(cur_pieces)
+        if base_pieces.get(pid) != cur_pieces.get(pid)
+    )
+
+    baseline_pose = parse_json_bytes(
+        baseline_pose_bytes, f"{resolved_commit}:{assembly_pose_rel}"
+    )
+    current_pose = parse_json_bytes(current_pose_bytes, assembly_pose_rel)
+    changed_pose_pieces, changed_pose_blocks = _validate_assembly_pose_invariance(
+        baseline_pose, current_pose, protected_piece_ids, comp
+    )
+
+    mesh_verified = _verify_component_mesh_in_blender(
+        job, groups, comp, old_evidence, base_root
+    )
+
+    return {
+        "root": base_root,
+        "productId": product_id,
+        "component": comp,
+        "pieceIds": list(piece_ids),
+        "protectedPieceIds": sorted(protected_piece_ids),
+        "baselineRevisionInput": rev_input,
+        "baselineRevision": resolved_commit,
+        "constructionPath": construction_path,
+        "constructionBytes": current_construction_bytes,
+        "construction": current_construction,
+        "oldEvidencePath": old_evidence_path,
+        "oldEvidenceRel": old_evidence_rel,
+        "oldEvidenceSha256": old_evidence_sha,
+        "oldEvidence": old_evidence,
+        "baselineAssemblyPoseSha256": baseline_pose_sha,
+        "baselinePatternSha256": baseline_pattern_sha,
+        "currentAssemblyPoseSha256": current_pose_sha,
+        "currentPatternSha256": current_pattern_sha,
+        "currentTargetSha256": current_target_sha,
+        "changedPatternPieces": changed_pattern_pieces,
+        "changedPosePieces": changed_pose_pieces,
+        "changedPoseBlocks": changed_pose_blocks,
+        "meshHashVerifiedInBlender": mesh_verified,
+    }
+
+
+def _content_addressed_evidence_path(
+    base_root: Path,
+    product_id: str,
+    component: str,
+    old_evidence_path: Path,
+    new_sha256: str,
+) -> Path:
+    stem = old_evidence_path.stem
+    if CONTENT_HASH_SUFFIX_RE.search(stem):
+        prefix = CONTENT_HASH_SUFFIX_RE.sub("", stem)
+    else:
+        prefix = f"{component}-bending"
+    return (
+        base_root
+        / ".image2outfit"
+        / "products"
+        / product_id
+        / "evidence"
+        / f"{prefix}-{new_sha256[:16]}.json"
+    )
+
+
+def rebind_component_bending(
+    job: dict[str, Any],
+    component: str,
+    baseline_revision: str,
+    *,
+    root: Path | None = None,
+) -> dict[str, Any]:
+    checked = verify_component_bending_rebind_preconditions(
+        job, component, baseline_revision, root=root
+    )
+    if (
+        checked["currentAssemblyPoseSha256"] == checked["baselineAssemblyPoseSha256"]
+        and checked["currentPatternSha256"] == checked["baselinePatternSha256"]
+    ):
+        return {
+            "status": "UNCHANGED",
+            "productId": checked["productId"],
+            "component": checked["component"],
+            "baselineRevision": checked["baselineRevision"],
+            "evidencePath": checked["oldEvidenceRel"],
+            "evidenceSha256": checked["oldEvidenceSha256"],
+            "meshHashVerifiedInBlender": checked["meshHashVerifiedInBlender"],
+        }
+
+    rebound_evidence = json.loads(json.dumps(checked["oldEvidence"]))
+    rebound_evidence["assemblyPoseSha256"] = checked["currentAssemblyPoseSha256"]
+    rebound_evidence["patternSha256"] = checked["currentPatternSha256"]
+    rebound_evidence["targetSourceSha256"] = checked["currentTargetSha256"]
+    rebound_evidence["constructionSha256"] = sha256_bytes(checked["constructionBytes"])
+    rebound_evidence["clothImplementationSha256"] = sha256_bytes(
+        Path(__file__).read_bytes()
+    )
+    blend_rel = job.get("blendPath")
+    if isinstance(blend_rel, str) and blend_rel.strip():
+        blend_path = repo_path(blend_rel, root=checked["root"])
+        if blend_path.is_file():
+            rebound_evidence["sourceBlendSha256"] = sha256_bytes(blend_path.read_bytes())
+    rebound_evidence["grantsFitAcceptance"] = False
+    rebound_evidence["grantsVisualAcceptance"] = False
+    rebound_evidence["rebindProvenance"] = {
+        "method": "baseline-component-invariance-rebind",
+        "component": checked["component"],
+        "pieceIds": checked["pieceIds"],
+        "protectedPieceIds": checked["protectedPieceIds"],
+        "baselineRevision": checked["baselineRevision"],
+        "baselineRevisionInput": checked["baselineRevisionInput"],
+        "baselineEvidencePath": checked["oldEvidenceRel"],
+        "baselineEvidenceSha256": checked["oldEvidenceSha256"],
+        "baselineAssemblyPoseSha256": checked["baselineAssemblyPoseSha256"],
+        "baselinePatternSha256": checked["baselinePatternSha256"],
+        "unchangedTargetSourceSha256": checked["currentTargetSha256"],
+        "changedNonComponentPatternPieces": checked["changedPatternPieces"],
+        "changedNonComponentPosePieces": checked["changedPosePieces"],
+        "changedNonComponentPoseBlocks": checked["changedPoseBlocks"],
+        "meshHashVerifiedInBlender": checked["meshHashVerifiedInBlender"],
+        "grantsFitAcceptance": False,
+        "grantsVisualAcceptance": False,
+        "evidenceBoundary": (
+            "Rebound from verified baseline bending evidence after proving all "
+            "component pieces, directly stitched neighbor pieces, component "
+            "placement blocks, cloth policy, and target source are unchanged "
+            "between baselineRevision and current inputs. Does not re-run "
+            "Blender Cloth or grant fit, pose, or visual acceptance."
+        ),
+    }
+
+    evidence_bytes = (
+        json.dumps(rebound_evidence, ensure_ascii=False, indent=2) + "\n"
+    ).encode("utf-8")
+    new_sha256 = sha256_bytes(evidence_bytes)
+    new_evidence_path = _content_addressed_evidence_path(
+        checked["root"],
+        checked["productId"],
+        checked["component"],
+        checked["oldEvidencePath"],
+        new_sha256,
+    )
+    atomic_write_bytes(new_evidence_path, evidence_bytes)
+    if sha256_bytes(new_evidence_path.read_bytes()) != new_sha256:
+        raise RuntimeError("Written rebound bending evidence hash mismatch")
+
+    new_evidence_rel = str(
+        new_evidence_path.relative_to(checked["root"])
+    ).replace("\\", "/")
+    updated_construction = json.loads(json.dumps(checked["construction"]))
+    declared = updated_construction["clothSimulation"]["prototypeComponentBending"][
+        checked["component"]
+    ]
+    declared["evidencePath"] = new_evidence_rel
+    declared["evidenceSha256"] = new_sha256
+    declared["evidenceBoundary"] = (
+        f"Pattern-bound native Blender {rebound_evidence['blenderVersion']}, "
+        f"{rebound_evidence['frameEnd']}-frame isolated {checked['component']} "
+        f"bending comparison at stiffness {declared['stiffness']}, rebound from "
+        f"baseline {checked['baselineRevision'][:7]} "
+        f"({checked['oldEvidenceSha256'][:16]}) after verifying component and "
+        "stitched-seam invariance. Diagnostic geometry only; no fit, pose, or "
+        "visual acceptance."
+    )
+    construction_bytes = (
+        json.dumps(updated_construction, ensure_ascii=False, indent=2) + "\n"
+    ).encode("utf-8")
+    atomic_write_bytes(checked["constructionPath"], construction_bytes)
+
+    return {
+        "status": "REBOUND",
+        "productId": checked["productId"],
+        "component": checked["component"],
+        "baselineRevision": checked["baselineRevision"],
+        "previousEvidencePath": checked["oldEvidenceRel"],
+        "previousEvidenceSha256": checked["oldEvidenceSha256"],
+        "evidencePath": new_evidence_rel,
+        "evidenceSha256": new_sha256,
+        "changedNonComponentPatternPieces": checked["changedPatternPieces"],
+        "changedNonComponentPosePieces": checked["changedPosePieces"],
+        "changedNonComponentPoseBlocks": checked["changedPoseBlocks"],
+        "meshHashVerifiedInBlender": checked["meshHashVerifiedInBlender"],
+    }
+
+
 def bake_sewn_prototype(job: dict[str, object]) -> int:
     """Run a bounded solve on attributed panels, preserving the input .blend."""
+    _require_blender()
     blend = repo_path(str(job["blendPath"]))
     source_hash = hashlib.sha256(blend.read_bytes()).hexdigest()
     construction_path = repo_path(job["garmentPipeline"]["constructionPath"])
@@ -571,29 +1410,17 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError("Bending declaration references an unknown cloth component")
         if name in bending:
             declared = bending[name]
-            value = declared["stiffness"]
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-                raise ValueError("Finite numeric bending stiffness is required")
             modifier = obj.modifiers["Image2Outfit Cloth"]
             limits = modifier.settings.bl_rna.properties["bending_stiffness"]
-            if not limits.hard_min <= value <= limits.hard_max:
-                raise ValueError("Declared bending stiffness exceeds native Blender limits")
-            evidence_path = repo_path(declared["evidencePath"])
-            if hashlib.sha256(evidence_path.read_bytes()).hexdigest() != declared["evidenceSha256"]:
-                raise ValueError("Bending comparison evidence hash mismatch")
-            evidence = read_json(evidence_path)
-            if (evidence.get("productId") != job["id"]
-                    or evidence.get("blenderVersion") != bpy.app.version_string
-                    or evidence.get("bendingStiffness") != value
-                    or evidence.get("bendingModel") != modifier.settings.bending_model
-                    or evidence.get("frameEnd") != frame_end
-                    or evidence.get("cacheBaked") is not True):
-                raise ValueError("Bending comparison is incompatible with this solve")
-            for key, path in (("assemblyPoseSha256", job["garmentPipeline"]["assemblyPosePath"]),
-                              ("patternSha256", job["garmentPipeline"]["patternContractPath"]),
-                              ("targetSourceSha256", job["targetSourcePath"])):
-                if evidence.get(key) != hashlib.sha256(repo_path(path).read_bytes()).hexdigest():
-                    raise ValueError("Bending comparison inputs are stale: " + key)
+            value, _ = validate_component_bending_evidence(
+                job,
+                declared,
+                frame_end=frame_end,
+                blender_version=bpy.app.version_string,
+                bending_model=modifier.settings.bending_model,
+                stiffness_min=limits.hard_min,
+                stiffness_max=limits.hard_max,
+            )
             modifier.settings.bending_stiffness = value
             contract["componentBending"] = {
                 "stiffness": modifier.settings.bending_stiffness,
@@ -719,9 +1546,35 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     return 0
 
 
-def main() -> int:
-    options = parse_args()
-    job = read_json(repo_path(options.job))
+def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
+    options = parse_args(argv)
+    job = read_json(repo_path(options.job, root=root))
+    if (
+        options.rebind_bending_component is not None
+        or options.baseline_revision is not None
+    ):
+        if (
+            options.rebind_bending_component is None
+            or options.baseline_revision is None
+            or not options.rebind_bending_component.strip()
+            or not options.baseline_revision.strip()
+        ):
+            raise ValueError(
+                "--rebind-bending-component and --baseline-revision must be provided together"
+            )
+        if options.prototype or options.force:
+            raise ValueError(
+                "--rebind-bending-component cannot be combined with --prototype or --force"
+            )
+        result = rebind_component_bending(
+            job,
+            options.rebind_bending_component,
+            options.baseline_revision,
+            root=root,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    _require_blender()
     product_id = str(job.get("id", ""))
     if options.prototype:
         return bake_sewn_prototype(job)
