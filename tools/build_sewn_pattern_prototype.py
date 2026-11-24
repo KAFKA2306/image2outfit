@@ -746,7 +746,15 @@ def place_on_measured_upper_surface(
         weight *= seam_factors.get(i, 1.0)
         location, normal, _, distance = tree.find_nearest(point)
         if location is None or distance > limit or normal.length < .99:
-            raise ValueError(f"{placement_key} projection unavailable/out of bounds at vertex {i}")
+            raise ValueError(
+                f"{placement_key} projection unavailable/out of bounds at vertex {i}: "
+                f"pieceIds={sorted(pieces)}, pointM={tuple(round(float(v), 9) for v in point)}, "
+                f"nearestBodyPointM={tuple(round(float(v), 9) for v in location) if location is not None else None}, "
+                f"distanceM={round(float(distance), 9) if distance is not None else None}, "
+                f"maximumProjectionDistanceM={limit}, "
+                f"normal={tuple(round(float(v), 9) for v in normal) if normal is not None else None}, "
+                f"normalLength={round(float(normal.length), 9) if normal is not None else None}"
+            )
         offset = clearance + (spec["outerLayerOffsetM"] if pieces == {spec["outerPieceId"]} else 0)
         result = point.lerp(location + normal*offset, weight)
         mesh["vertices"][i] = list(result)
