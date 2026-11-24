@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "blenderVersion": "4.4.3",
+  "sourceBlendSha256": "56848c4e26bbf57514025800ef79f7b4d1f8ded5298dde2ea2e47a1a719bd77b",
+  "constructionSha256": "7c09eea4cd3c0c7de6c42e8862e34d4efdf8d2a166b0a3326bc44e3af1db5791",
+  "assemblyPoseSha256": "ffedd8cb7ae00803651047f677031fd237daee29d6f480eadbbee1ec24c791b8",
+  "patternSha256": "f7147d0d57c077240f7f70d53684220c7ad77580b3dae58cc7532ff398449f63",
+  "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+  "clothImplementationSha256": "e696a00b8f84182fc463291736cd3add483edbc20c0c06390d190f405119badd",
+  "sourceSkirtMeshSha256": "928e04907982513286a635e1231f8dfa05b8f45a487a9dc15185f67da9a47f31",
+  "bendingStiffness": 20,
+  "bendingStiffnessMax": 20,
+  "bendingModel": "ANGULAR",
+  "frameEnd": 16,
+  "cacheBaked": true,
+  "settledMeshSha256": "1531dc079ef3a4d485d6a29d3f6fa2481d3688b698fd7656f128ce7bb8fd0c24",
+  "grantsFitAcceptance": false,
+  "grantsVisualAcceptance": false,
+  "evidenceProjection": "Hash-bound component-invariance summary; raw geometry and local execution paths omitted.",
+  "rebindProvenance": {
+    "method": "baseline-component-invariance-rebind",
+    "component": "pleated-overskirt",
+    "pieceIds": [
+      "overskirt-front",
+      "overskirt-back"
+    ],
+    "protectedPieceIds": [
+      "overskirt-back",
+      "overskirt-front",
+      "waistband-back",
+      "waistband-front"
+    ],
+    "baselineRevision": "17ec15bcb94ec6af2125ab3743ad2f887062cfd4",
+    "baselineRevisionInput": "17ec15bcb94e",
+    "baselineEvidenceSha256": "75781f9caf1f239f30167cf3edfab9b089da6cb52f0f293effa38dba52cc6206",
+    "baselineAssemblyPoseSha256": "ffedd8cb7ae00803651047f677031fd237daee29d6f480eadbbee1ec24c791b8",
+    "baselinePatternSha256": "e69d4e761b73e836e1e83fbcf09660bfac56054bc479acda2ec173696a27890e",
+    "unchangedTargetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "changedNonComponentPatternPieces": [
+      "shorts-back-left",
+      "shorts-back-right",
+      "shorts-front-left",
+      "shorts-front-right"
+    ],
+    "changedNonComponentPosePieces": [],
+    "changedNonComponentPoseBlocks": [],
+    "meshHashVerifiedInBlender": true,
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "evidenceBoundary": "Rebound from verified baseline bending evidence after proving all component pieces, directly stitched neighbor pieces, component placement blocks, cloth policy, and target source are unchanged between baselineRevision and current inputs. Does not re-run Blender Cloth or grant fit, pose, or visual acceptance."
+  }
+}

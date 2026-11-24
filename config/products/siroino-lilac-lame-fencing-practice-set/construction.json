@@ -116,13 +116,13 @@
     },
     "prototypeFrameEnd": 16,
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
-    "reason": "The shorts now use a provisional segmented thigh and crotch-rise outline; bending evidence is remeasured for the current pattern, target and assembly pose. Fit, gusset, Shape Key and motion acceptance remain open.",
+    "reason": "The 40 mm hem extension reaches below the measured knee landmark but current sit/crouch renders still show thigh exposure. The current pattern, assembly pose and target are hash-bound; next correction must address seat/gusset tracking. Fit, Shape Key and motion acceptance remain open.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-fb785348c03ef0a1.json",
-        "evidenceSha256": "fb785348c03ef0a117e723f837c3a07bc0999557bfbcbfdb6c1c74052732d920",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated overskirt bending comparison at stiffness 20 for the current shaped-shorts pattern and measured Neutral contour anchors. Diagnostic geometry only; no fit, pose, or visual acceptance."
+        "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/skirt-bending-component-rebind.json",
+        "evidenceSha256": "0c7afaa2984a9ccfaeeffc1a77ad8768589bb40513f31fb665e75fdec133e0c3",
+        "evidenceBoundary": "Hash-bound Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20. Rebound from verified baseline after proving skirt and stitched neighbors unchanged; only the four shorts panels changed. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
   },
@@ -150,7 +150,7 @@
         "waistband-back"
       ],
       "bodyTriangleZM": [
-         0.42,
+        0.42,
         0.87
       ],
       "excludedBoneNamePrefixes": [
@@ -192,7 +192,7 @@
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
           "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "Prototype-only shorts weighting hypothesis from the previous measured four-panel mesh. After a 50 mm hem extension, rerun skin export and inspect transfer to ipsilateral thigh/calf surfaces. This grants no coverage, deformation, fit, Shape Key or runtime acceptance."
+          "evidenceBoundary": "After a 40 mm hem extension on all four shorts panels, the current prototype reaches z=0.3896 m against the measured 0.4144 m knee landmark, yet directly inspected sit/crouch renders still expose the thighs. Measured thigh weighting remains a hypothesis (mean 0.243, maximum 0.65); next correction must address seat/gusset tracking, not another unmeasured hem extension. No coverage, deformation, fit, Shape Key or runtime acceptance."
         }
       ]
     }
