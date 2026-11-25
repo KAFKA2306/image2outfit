@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import deque
 import hashlib
 import json
 import json
@@ -28,6 +29,85 @@ def digest(path):
 def _smoothstep(value):
     value = max(0.0, min(1.0, float(value)))
     return value * value * (3.0 - 2.0 * value)
+
+
+def _interior_taper(obj, profile):
+    experiment = profile.get("interiorThighBoostExperiment")
+    if experiment is None:
+        return None
+    piece_ids = json.loads(obj.get("canonicalPieceIds", "[]"))
+    if not piece_ids:
+        raise ValueError("Interior weight experiment requires canonical piece IDs")
+    piece_attribute = obj.data.attributes.get("canonical_piece_index")
+    sewn_attribute = obj.data.attributes.get("canonical_sewn_vertex_index")
+    if piece_attribute is None or sewn_attribute is None:
+        raise ValueError("Interior weight experiment requires canonical face and sewn vertex IDs")
+    if piece_attribute.domain != "FACE" or piece_attribute.data_type != "INT":
+        raise ValueError("canonical_piece_index must be an integer face attribute")
+    if sewn_attribute.domain != "POINT" or sewn_attribute.data_type != "INT":
+        raise ValueError("canonical_sewn_vertex_index must be an integer point attribute")
+    target_id = experiment["pieceId"]
+    neighbor_ids = set(experiment["neighborPieceIds"])
+    if target_id not in piece_ids or not neighbor_ids.issubset(set(piece_ids)):
+        raise ValueError("Interior weight experiment references an unknown sewn piece")
+
+    vertices_by_piece = {piece_id: set() for piece_id in piece_ids}
+    for face, owner in zip(obj.data.polygons, piece_attribute.data):
+        vertices_by_piece[piece_ids[owner.value]].update(face.vertices)
+    target_vertices = vertices_by_piece[target_id]
+    sewn_ids_by_piece = {
+        piece_id: {
+            int(sewn_attribute.data[index].value)
+            for index in indices
+            if int(sewn_attribute.data[index].value) >= 0
+        }
+        for piece_id, indices in vertices_by_piece.items()
+    }
+    shared_sewn_ids = set().union(*(
+        sewn_ids_by_piece[target_id] & sewn_ids_by_piece[neighbor]
+        for neighbor in neighbor_ids
+    ))
+    boundary_vertices = {
+        index for index in target_vertices
+        if int(sewn_attribute.data[index].value) in shared_sewn_ids
+    }
+    interior_vertices = target_vertices - boundary_vertices
+    if (len(boundary_vertices) != experiment["expectedBoundaryVertexCount"]
+            or len(interior_vertices) != experiment["expectedInteriorVertexCount"]):
+        raise ValueError(
+            "Interior weight experiment topology changed: "
+            f"boundary={len(boundary_vertices)} interior={len(interior_vertices)}"
+        )
+    adjacency = {index: set() for index in target_vertices}
+    for edge in obj.data.edges:
+        first, second = edge.vertices
+        if first in target_vertices and second in target_vertices:
+            adjacency[first].add(second)
+            adjacency[second].add(first)
+    rings = {index: 0 for index in boundary_vertices}
+    queue = deque(sorted(boundary_vertices))
+    while queue:
+        current = queue.popleft()
+        for neighbor in adjacency[current]:
+            if neighbor not in rings:
+                rings[neighbor] = rings[current] + 1
+                queue.append(neighbor)
+    if set(rings) != target_vertices:
+        raise ValueError("Interior weight experiment found disconnected wrap vertices")
+    taper_rings = int(experiment["taperEdgeRings"])
+    factors = {
+        index: _smoothstep(min(1.0, rings[index] / taper_rings))
+        for index in target_vertices
+    }
+    return {
+        "targetPieceId": target_id,
+        "targetVertices": target_vertices,
+        "boundaryVertices": boundary_vertices,
+        "interiorVertices": interior_vertices,
+        "ringDistance": rings,
+        "fadeFactor": factors,
+        "config": experiment,
+    }
 
 
 def main():
@@ -84,6 +164,19 @@ def main():
                     raise ValueError(f"Prototype weight profile bone is missing or non-deform: {bone_name}")
             if profile["leftThighBone"] == profile["rightThighBone"]:
                 raise ValueError("Prototype weight profile requires distinct left and right thigh bones")
+            experiment = profile.get("interiorThighBoostExperiment")
+            if experiment is not None:
+                if (experiment.get("method") != "sewn-boundary-geodesic-fade-v1"
+                        or experiment.get("pieceId") not in profile_piece_ids
+                        or not experiment.get("neighborPieceIds")
+                        or experiment["pieceId"] in experiment["neighborPieceIds"]
+                        or not set(experiment["neighborPieceIds"]).issubset(profile_piece_ids)
+                        or not 0 < experiment["boostWeight"] <= 0.25
+                        or not 0 <= experiment["maximumThighWeight"] <= 0.65
+                        or experiment["taperEdgeRings"] < 1
+                        or experiment["expectedBoundaryVertexCount"] < 1
+                        or experiment["expectedInteriorVertexCount"] < 1):
+                    raise ValueError("Invalid sewn-boundary-preserving thigh-weight experiment")
             for piece_id in profile_piece_ids:
                 if piece_id in profiles_by_piece:
                     raise ValueError(f"Conflicting prototype weight profiles for piece {piece_id}")
@@ -118,6 +211,11 @@ def main():
         profile_accumulators = {}
         active_profiles = {id(profile): profile for piece_id, profile in profiles_by_piece.items()
                            if any(piece_id in owner_set for owner_set in owners)}
+        interior_tapers = {
+            profile_key: _interior_taper(obj, profile)
+            for profile_key, profile in active_profiles.items()
+            if profile.get("interiorThighBoostExperiment") is not None
+        }
         for profile_key, profile in active_profiles.items():
             profile_piece_ids = set(profile["pieceIds"])
             selected_vertices = [index for index, owner_set in enumerate(owners)
@@ -141,6 +239,7 @@ def main():
                 "centerlineVertexCount": 0,
                 "leftSideVertexCount": 0,
                 "rightSideVertexCount": 0,
+                "interiorBoostRecords": [],
             }
         raw = {}
         for vertex in obj.data.vertices:
@@ -202,6 +301,24 @@ def main():
                 else:
                     thigh_bone = profile["hipBone"]
                     profile_accumulators[profile_key]["centerlineVertexCount"] += 1
+                taper = interior_tapers.get(profile_key)
+                if (taper is not None
+                        and vertex.index in taper["targetVertices"]):
+                    baseline_thigh_weight = thigh_weight
+                    boost = (taper["config"]["boostWeight"]
+                             * taper["fadeFactor"][vertex.index])
+                    thigh_weight = min(
+                        taper["config"]["maximumThighWeight"],
+                        thigh_weight + boost,
+                    )
+                    profile_accumulators[profile_key]["interiorBoostRecords"].append({
+                        "vertexIndex": vertex.index,
+                        "isSharedBoundary": vertex.index in taper["boundaryVertices"],
+                        "ringDistance": taper["ringDistance"][vertex.index],
+                        "fadeFactor": taper["fadeFactor"][vertex.index],
+                        "baselineThighWeight": baseline_thigh_weight,
+                        "candidateThighWeight": thigh_weight,
+                    })
                 if thigh_weight > 0:
                     raw[vertex.index] = [(profile["hipBone"], 1.0-thigh_weight), (thigh_bone, thigh_weight)]
                 else:
@@ -243,6 +360,43 @@ def main():
                         "mean": sum(accumulator["thighWeights"])/len(accumulator["thighWeights"]),
                         "maximum": max(accumulator["thighWeights"]),
                     },
+                    "interiorThighBoostExperiment": (
+                        {
+                            **dict(interior_tapers[key]["config"]),
+                            "sharedBoundaryVertexCount": len(interior_tapers[key]["boundaryVertices"]),
+                            "interiorVertexCount": len(interior_tapers[key]["interiorVertices"]),
+                            "changedInteriorVertexCount": sum(
+                                record["candidateThighWeight"] > record["baselineThighWeight"] + 1e-12
+                                for record in accumulator["interiorBoostRecords"]
+                                if not record["isSharedBoundary"]
+                            ),
+                            "boundaryVertexCountWithExactBaselineWeight": sum(
+                                record["isSharedBoundary"]
+                                and record["candidateThighWeight"] == record["baselineThighWeight"]
+                                for record in accumulator["interiorBoostRecords"]
+                            ),
+                            "baselineInteriorMeanThighWeight": (
+                                sum(record["baselineThighWeight"] for record in accumulator["interiorBoostRecords"]
+                                    if not record["isSharedBoundary"])
+                                / len(interior_tapers[key]["interiorVertices"])
+                            ),
+                            "candidateInteriorMeanThighWeight": (
+                                sum(record["candidateThighWeight"] for record in accumulator["interiorBoostRecords"]
+                                    if not record["isSharedBoundary"])
+                                / len(interior_tapers[key]["interiorVertices"])
+                            ),
+                            "taperRingDistance": {
+                                "minimum": min(record["ringDistance"] for record in accumulator["interiorBoostRecords"]),
+                                "maximum": max(record["ringDistance"] for record in accumulator["interiorBoostRecords"]),
+                                "fullBoostVertexCount": sum(
+                                    record["fadeFactor"] >= 1.0
+                                    for record in accumulator["interiorBoostRecords"]
+                                ),
+                            },
+                            "grantsFitAcceptance": False,
+                        }
+                        if key in interior_tapers else None
+                    ),
                     "grantsFitAcceptance": False,
                     "evidenceBoundary": accumulator["profile"]["evidenceBoundary"],
                 }

@@ -196,6 +196,22 @@
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
           "fullSideWeightWidthM": 0.06,
+          "interiorThighBoostExperiment": {
+            "method": "sewn-boundary-geodesic-fade-v1",
+            "pieceId": "shorts-thigh-wrap",
+            "neighborPieceIds": [
+              "shorts-front-left",
+              "shorts-front-right",
+              "shorts-back-left",
+              "shorts-back-right"
+            ],
+            "boostWeight": 0.12,
+            "maximumThighWeight": 0.65,
+            "taperEdgeRings": 3,
+            "expectedBoundaryVertexCount": 60,
+            "expectedInteriorVertexCount": 230,
+            "evidenceBoundary": "Controlled component-only prototype experiment prompted by crouch/sit wrap-to-body gaps. Adds up to 0.12 same-side thigh influence only to shorts-thigh-wrap vertices, smoothly ramped over three topological rings inward from the four shared sewn boundaries; preserves baseline profile at all 60 shared boundary vertices and leaves other garment pieces unchanged. Diagnostic candidate only; no fit, coverage, penetration, appearance or runtime acceptance."
+          },
           "evidenceBoundary": "Prototype hip/thigh weighting region includes the continuous inner-thigh wrap panel alongside the four shorts panels. Weight response and coverage remain unmeasured; no pose, fit, penetration, deformation, Shape Key or runtime acceptance."
         }
       ]

@@ -111,6 +111,65 @@
                 "type": "number",
                 "exclusiveMinimum": 0
               },
+              "interiorThighBoostExperiment": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "method",
+                  "pieceId",
+                  "neighborPieceIds",
+                  "boostWeight",
+                  "maximumThighWeight",
+                  "taperEdgeRings",
+                  "expectedBoundaryVertexCount",
+                  "expectedInteriorVertexCount",
+                  "evidenceBoundary"
+                ],
+                "properties": {
+                  "method": {
+                    "const": "sewn-boundary-geodesic-fade-v1"
+                  },
+                  "pieceId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "neighborPieceIds": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "boostWeight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 0.25
+                  },
+                  "maximumThighWeight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.65
+                  },
+                  "taperEdgeRings": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "expectedBoundaryVertexCount": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "expectedInteriorVertexCount": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "evidenceBoundary": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
               "evidenceBoundary": {
                 "type": "string",
                 "minLength": 1
