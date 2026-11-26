@@ -21,17 +21,17 @@
     {
       "severity": "BLOCKER",
       "code": "SHORTS_POSE_COVERAGE",
-      "description": "Directly inspected all five current views and six poses after redistributing the shorts wrap boundary from 160 mm transverse by 240 mm longitudinal to 200 mm by 207.846 mm. The crouch still shows a bright triangular discontinuity and the sit retains a pale inter-thigh sheet. Width redistribution alone did not resolve the pose appearance; the four matched 0.144222 m seams remain the construction constraint. No fit, opacity, strain, Shape Key or runtime acceptance. Current weighted-mesh distance measurement: wrap median distance to the deformed avatar is 3.6 mm neutral, 34.3 mm crouched, and 44.8 mm seated. Mean wrap thigh weight is 0.092 with 0.908 Hips weight; adjacent front-panel mean thigh weight is 0.267. This supports deformation/weight response as the primary wrap-gap hypothesis; it does not grant fit or appearance acceptance. Canonical sewn-edge audit: the wrap shares 16 vertex IDs with each of the four shorts panels, and maximum absolute Hips/UpperLeg_L/UpperLeg_R weight delta is 0 at every matched edge vertex. Across the 60 unique shared boundary vertices, mean Hips/thigh weights are 0.961/0.039; across the 230 interior vertices they are 0.894/0.106. The low thigh influence is therefore localized to the panel interior; sewn-edge weights already match."
+      "description": "Directly inspected the current front, back, left, right, three-quarter views and all six required poses. In neutral and arms-up, a central segmented pale panel is visibly exposed below the overskirt; the crouch shows strong thigh/body exposure and split cloth; sit retains exposed thigh and detached/angular rear cloth. The longer shaped-hem draft was built and simulated, but the visual result remains unacceptable. This is prototype appearance evidence only; garment ease, fit, Shape Key behavior, strain and runtime are not accepted."
     },
     {
       "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "Directly inspected all five refreshed views and six poses. The standing skirt remains a broad A-line with irregular folds rather than clearly ordered pleats. Crouch, sit and prone show large angular rear/between-leg sheets and curled or collapsed hem sections. No appearance or cloth-motion acceptance."
+      "description": "Directly inspected all current views and poses. Standing skirt remains broad and irregular rather than clearly pleated. Crouch and sit show curled and angular rear/between-leg panels; prone is collapsed into a blocky sheet. Cloth simulation completed, but pose appearance is rejected."
     },
     {
       "severity": "BLOCKER",
       "code": "JACKET_SURFACE_QUALITY",
-      "description": "Directly inspected all five refreshed views and six poses. Sleeve and underarm transitions remain visibly faceted and wrinkled in neutral, raised-arm and crossed-arm views; the collar still reads as a tall open cylindrical rim. The diagonal lilac closure reads as a broad strip, while narrow edging and rear waist tab remain hard to distinguish. Surface, neckline, measured fit, strain, clearance and runtime remain unverified."
+      "description": "Directly inspected all current views and poses. The collar remains a tall open cylindrical rim. Sleeves and underarm transitions are visibly faceted and heavily wrinkled, including arms-up and crossed-arm. No measured fit, clearance, strain, or runtime acceptance."
     }
   ],
   "failedGeometryChecks": [

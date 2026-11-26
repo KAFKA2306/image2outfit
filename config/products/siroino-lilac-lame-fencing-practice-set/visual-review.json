@@ -7,37 +7,37 @@
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "4237352bfc7e05b420580f05f117e6e198e1dbb58a2b85094c080478aab8d902",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e0db398fe3a1ec08c617db79405de125a9c101528db8867c7ed839498baacca4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "ea5f02a8e813e3e8245a3498bb085496e1abf6c8329015ecfc4a84fa6e6dfaf7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "2599c9c1693eba8ac8dead9b4bd921d7e0fac19018aef768b20c49d47c38bfd7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "473d2d86197c514831bf9f442e52f1d48740a253ff28546c817c431cb7a79253",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "bd114956f2eedcb0c36f5f6264dd60fa3f1da89013838604aef0bff860a8c996",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "228dcdc4d2f8cedc24ffe2b073485b47c8c88498d23820066b16bdb7582913ef",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "47a27785d622abd5ca66ed62a0471855bdf634f7c966692246d0d6ecf2505234",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "3ef8ed16970c2836629756acc7a1d98351b7c0a94567c7450a573b1ece081872",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "435f2f579f257e5bbb9d8783b8d9b62a8cbd19484136d116abfd0211bef9fbb4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "435ff0807259e3df74a870ebb163a57d53ce28fa049151ffa1850cdb55a3df39"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "f0420997b04f8c84cd9b79fed88e3e586e4e03fb5a9c93dd5164135f798d88b6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "1d3873041613f169714ca13e7a24c0e1eb409f8ee0bca137ed34f54ee08495ff",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8b283ac52e41534f8d6ee4a8e9661e6844dc5dbf5a0489f0c38901df57e83873",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "cf056255d7a5c1696ce813cc2217f2a79735a4b7bcd266a6e1eda65473027527",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "25a4f9c14cf699ac13c843f73fdb81860dd545c376ca15adabb5b1475128ebfb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "8da2951c6db52f6c515cab02ad28c1a184413f2c8395aad53613676eed2fe17c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "4657d4371ff2e6851923116728d1781063e5dceac2f6cf09dd034129cab2f1e0",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "e27dd103a429c6818e799a2ec82e686c3facb2c877efb5570d7dd4d00e94985d",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "bd17fcc33aa27c3c7332c396afe5804e5f99ae4eee0ecbc0baf7c4af9816994b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "6b163084911e3c29d363717aa6695f03a9e43b0dce1b9eb6c249118c607601cf",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "4fee44dbe80610c64aea8776a5c60aaa9c4ec0c9afd3dad99b32a14beaa96a60"
   },
   "findings": [
     {
       "severity": "BLOCKER",
       "code": "SHORTS_POSE_COVERAGE",
-      "description": "Directly inspected all five current views and six poses after redistributing the shorts wrap boundary from 160 mm transverse by 240 mm longitudinal to 200 mm by 207.846 mm. The crouch still shows a bright triangular discontinuity and the sit retains a pale inter-thigh sheet. Width redistribution alone did not resolve the pose appearance; the four matched 0.144222 m seams remain the construction constraint. No fit, opacity, strain, Shape Key or runtime acceptance. Current weighted-mesh distance measurement: wrap median distance to the deformed avatar is 3.6 mm neutral, 34.3 mm crouched, and 44.8 mm seated. Mean wrap thigh weight is 0.092 with 0.908 Hips weight; adjacent front-panel mean thigh weight is 0.267. Controlled same-side thigh-follow and neutral rest-surface-follow candidates did not materially improve directly inspected crouch/sit coverage. Nearest-body-triangle weight transfer on the four shorts panels materially worsened the seated render: median thigh weights increased from 0.267–0.284 to 0.899–0.920, with exposed body and collapsed fabric; experiment evidence: .image2outfit/products/siroino-lilac-lame-fencing-practice-set/experiment-shorts-panel-body-weight-transfer.json. All 156 shared sewn-boundary vertices and all weights outside the four panel interiors remained unchanged. A six-pose target-body trajectory weight fit also failed visual review: the four-panel interiors changed while all 156 shared seam vertices and all outside vertices remained unchanged; median body-surface trajectory residual moved only from 1.013 mm to 1.008 mm and p95 from 148.1 mm to 61.0 mm, yet direct crouch/sit renders show new exposure/collapse while the pale sheet remains. The nearest-body trajectory objective does not encode garment ease or coverage; its residual is not a fit score. Constant weight offsets, neutral surface projection, direct body-weight transfer, and body-surface trajectory fitting have not resolved the pose defect. No fit or appearance acceptance. Canonical sewn-edge audit: the wrap shares 16 vertex IDs with each of the four shorts panels, and maximum absolute Hips/UpperLeg_L/UpperLeg_R weight delta is 0 at every matched edge vertex. Across the 60 unique shared boundary vertices, mean Hips/thigh weights are 0.961/0.039; across the 230 interior vertices they are 0.894/0.106. The low thigh influence is therefore localized to the panel interior; sewn-edge weights already match. A separate continuous-drafted-gusset candidate used the registered 200 x 207.846 mm pattern envelope, all 60 unique vertices of the four existing seam paths, a 18–104 mm shaped free-hem drop and 10 mm garment ease. Seam-coordinate max error and seam-weight max delta were both 0. Directly inspected all six separately rendered poses: crouch/sit exposure remained, while neutral/arms-up/arm-cross gained a hard segmented band visible through the overskirt. REJECTED_VISUAL; no fit or acceptance. Private evidence: .image2outfit/products/siroino-lilac-lame-fencing-practice-set/analysis/drafted-gusset-hem/experiment-drafted-gusset-hem.json (SHA-256 3158cdcc419fc186f13dcb1dc6a1fb10964a254a7c3c24500e6275eb159dedb1)."
+      "description": "Directly inspected the current front, back, left, right, three-quarter views and all six required poses. In neutral and arms-up, a central segmented pale panel is visibly exposed below the overskirt; the crouch shows strong thigh/body exposure and split cloth; sit retains exposed thigh and detached/angular rear cloth. The longer shaped-hem draft was built and simulated, but the visual result remains unacceptable. This is prototype appearance evidence only; garment ease, fit, Shape Key behavior, strain and runtime are not accepted."
     },
     {
       "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "Directly inspected all five refreshed views and six poses. The standing skirt remains a broad A-line with irregular folds rather than clearly ordered pleats. Crouch, sit and prone show large angular rear/between-leg sheets and curled or collapsed hem sections. No appearance or cloth-motion acceptance."
+      "description": "Directly inspected all current views and poses. Standing skirt remains broad and irregular rather than clearly pleated. Crouch and sit show curled and angular rear/between-leg panels; prone is collapsed into a blocky sheet. Cloth simulation completed, but pose appearance is rejected."
     },
     {
       "severity": "BLOCKER",
       "code": "JACKET_SURFACE_QUALITY",
-      "description": "Directly inspected all five refreshed views and six poses. Sleeve and underarm transitions remain visibly faceted and wrinkled in neutral, raised-arm and crossed-arm views; the collar still reads as a tall open cylindrical rim. The diagonal lilac closure reads as a broad strip, while narrow edging and rear waist tab remain hard to distinguish. Surface, neckline, measured fit, strain, clearance and runtime remain unverified."
+      "description": "Directly inspected all current views and poses. The collar remains a tall open cylindrical rim. Sleeves and underarm transitions are visibly faceted and heavily wrinkled, including arms-up and crossed-arm. No measured fit, clearance, strain, or runtime acceptance."
     }
   ],
   "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/render-evidence.json",
-  "nextAction": "Keep product REJECT. The registered four-edge crotch insert cannot be lengthened by a perimeter hem without a visible layered stripe, and panel-size/edge-extension variants have not resolved crouch/sit coverage. Next inspect the shorts body-panel topology and coverage boundary as a garment construction: draft longer continuous front/back shorts legs with shaped inner-leg curves, regenerate from pattern/stitch owners, then render all six poses. Do not project avatar skin, append narrow strips, or accept fit from closest-surface metrics. Preserve tall-collar and collapsed-overskirt blockers; keep UV NOT_CREATED and runtime/release UNVERIFIED.",
+  "nextAction": "Keep ProductManifest REJECTED and release BLOCKED. Replace the current four-piece leg-panel/crotch-wrap topology with a continuous shorts body construction whose front/back panels and crotch gusset are drafted as a joined coverage envelope; do not add a narrow overlay or project avatar skin. In the same next build, prevent overskirt panels from folding between the thighs during crouch/sit, then regenerate the canonical pattern, stitch graph, cloth solve, five views, and six poses. Keep the jacket collar/sleeve blockers, UV NOT_CREATED, and fit/runtime/release UNVERIFIED.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",
@@ -304,7 +304,7 @@
       "component": "pleated-overskirt",
       "edgeId": "waist-opening",
       "heightM": 0.7395782470703125,
-      "toleranceM": 1e-06,
+      "toleranceM": 0.000001,
       "method": "open-boundary-at-declared-waist-height"
     },
     "pinVertexCount": 48,
@@ -422,7 +422,7 @@
       "blenderVersion": "4.4.3",
       "bone": "Neck",
       "headBlenderM": [
-        -2.053701209092651e-09,
+        -2.053701209092651e-9,
         -0.0093428585678339,
         1.0351301431655884
       ],
@@ -2341,7 +2341,7 @@
       "selectedVertexCount": 1814,
       "movedVertexCount": 1750,
       "maximumRadialDisplacementM": 0.01172093023255815,
-      "minimumTriangleAreaM2": 1.0472661275604241e-07,
+      "minimumTriangleAreaM2": 1.0472661275604241e-7,
       "beforeVerticesSha256": "c6c63c75c5e6b91ac1e48c085851195a154a682753ca98a59d388b5a868347f4",
       "afterVerticesSha256": "f621f13f4d2ad02978075a782e78ef789d0838b9310d1c33324396764b89ebce",
       "canonicalFacesChanged": false,
@@ -3834,7 +3834,7 @@
           "medianChangeM": 3.903127820947816e-18,
           "baselineP95M": 0.006282774778082967,
           "candidateP95M": 0.006282774778082967,
-          "p95ChangeM": 0.0,
+          "p95ChangeM": 0,
           "baselineVerticesBeyond10mm": 0,
           "candidateVerticesBeyond10mm": 0
         },
@@ -3866,14 +3866,14 @@
           "wrapBoundaryVertexCount": 16,
           "neighborBoundaryVertexCount": 16,
           "meanAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           },
           "maximumAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           }
         },
         "shorts-front-right": {
@@ -3882,14 +3882,14 @@
           "wrapBoundaryVertexCount": 16,
           "neighborBoundaryVertexCount": 16,
           "meanAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           },
           "maximumAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           }
         },
         "shorts-back-left": {
@@ -3898,14 +3898,14 @@
           "wrapBoundaryVertexCount": 16,
           "neighborBoundaryVertexCount": 16,
           "meanAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           },
           "maximumAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           }
         },
         "shorts-back-right": {
@@ -3914,14 +3914,14 @@
           "wrapBoundaryVertexCount": 16,
           "neighborBoundaryVertexCount": 16,
           "meanAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           },
           "maximumAbsoluteWeightDeltaAtSharedVertices": {
-            "Hips": 0.0,
-            "UpperLeg_L": 0.0,
-            "UpperLeg_R": 0.0
+            "Hips": 0,
+            "UpperLeg_L": 0,
+            "UpperLeg_R": 0
           }
         },
         "wrapWeightDistribution": {
@@ -3935,23 +3935,23 @@
                 "p05": 0.4824569582939148,
                 "median": 0.8799999952316284,
                 "mean": 0.8348971483008615,
-                "p95": 1.0,
-                "max": 1.0
+                "p95": 1,
+                "max": 1
               },
               "UpperLeg_L": {
                 "count": 290,
-                "min": 0.0,
-                "p05": 0.0,
-                "median": 0.0,
+                "min": 0,
+                "p05": 0,
+                "median": 0,
                 "mean": 0.08334116965432509,
                 "p95": 0.4591077759861947,
                 "max": 0.5529311299324036
               },
               "UpperLeg_R": {
                 "count": 290,
-                "min": 0.0,
-                "p05": 0.0,
-                "median": 0.0,
+                "min": 0,
+                "p05": 0,
+                "median": 0,
                 "mean": 0.08176167968549948,
                 "p95": 0.46262222528457647,
                 "max": 0.5512647032737732
@@ -3968,8 +3968,8 @@
             },
             "combinedThighWeight": {
               "count": 290,
-              "min": 0.0,
-              "p05": 0.0,
+              "min": 0,
+              "p05": 0,
               "median": 0.11999999731779099,
               "mean": 0.16510284933982458,
               "p95": 0.5175430417060852,
@@ -3991,23 +3991,23 @@
                 "p05": 0.8795102804899215,
                 "median": 0.9692496657371521,
                 "mean": 0.9608947296937307,
-                "p95": 1.0,
-                "max": 1.0
+                "p95": 1,
+                "max": 1
               },
               "UpperLeg_L": {
                 "count": 60,
-                "min": 0.0,
-                "p05": 0.0,
-                "median": 0.0,
+                "min": 0,
+                "p05": 0,
+                "median": 0,
                 "mean": 0.02019309737547701,
                 "p95": 0.11806873977184296,
                 "max": 0.12103620916604996
               },
               "UpperLeg_R": {
                 "count": 60,
-                "min": 0.0,
-                "p05": 0.0,
-                "median": 0.0,
+                "min": 0,
+                "p05": 0,
+                "median": 0,
                 "mean": 0.018912170840667385,
                 "p95": 0.11806869022548198,
                 "max": 0.12103620916604996
@@ -4017,15 +4017,15 @@
               "count": 60,
               "min": 0.9999999701976776,
               "p05": 0.9999999748331447,
-              "median": 1.0,
+              "median": 1,
               "mean": 0.999999997909875,
               "p95": 1.0000000225845724,
               "max": 1.0000000298023224
             },
             "combinedThighWeight": {
               "count": 60,
-              "min": 0.0,
-              "p05": 0.0,
+              "min": 0,
+              "p05": 0,
               "median": 0.0307503342628479,
               "mean": 0.03910526821614439,
               "p95": 0.12048974148929119,
@@ -4052,8 +4052,8 @@
               },
               "UpperLeg_L": {
                 "count": 230,
-                "min": 0.0,
-                "p05": 0.0,
+                "min": 0,
+                "p05": 0,
                 "median": 0.05494648590683937,
                 "mean": 0.0998145798140246,
                 "p95": 0.4671140566468238,
@@ -4061,9 +4061,9 @@
               },
               "UpperLeg_R": {
                 "count": 230,
-                "min": 0.0,
-                "p05": 0.0,
-                "median": 0.0,
+                "min": 0,
+                "p05": 0,
+                "median": 0,
                 "mean": 0.09815720373197742,
                 "p95": 0.47033925801515575,
                 "max": 0.5512647032737732
