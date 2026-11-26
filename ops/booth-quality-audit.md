@@ -17,7 +17,7 @@ task booth:audit PRODUCT=siroino-lilac-lame-fencing-practice-set URL="https://bo
 ```
 
 The model revision, runtime revision, and provisional routing settings are in
-`config/booth-audit-model.json`. The installer stores the checkout, Python environment, and model
+`config/booth-audit/model.json`. The installer stores the checkout, Python environment, and model
 under ignored `Assets/_Local/booth-audit/`; it records the installed candidate and weight hashes in
 `.image2outfit/booth-audit/runtime-state.json`. It does not promote the model to a known-good
 production model.

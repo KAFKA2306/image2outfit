@@ -5,7 +5,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$lockPath = Join-Path $repoRoot "config/booth-audit-model.json"
+$lockPath = Join-Path $repoRoot "config/booth-audit/model.json"
 $lock = Get-Content -LiteralPath $lockPath -Raw -Encoding utf8 | ConvertFrom-Json
 $runtimeRoot = Join-Path $repoRoot "Assets/_Local/booth-audit/runtime"
 $runtimePath = Join-Path $runtimeRoot ("onnx-export-" + $lock.decisionModel.runtimeRevision.Substring(0, 8))

@@ -1221,7 +1221,7 @@ def run(repository_root: Path, product_id: str, raw_url: str | None) -> int:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     if job.get("id") != product_id:
         raise BoothAuditError("Product job id does not match its path.")
-    lock = json.loads((root / "config" / "booth-audit-model.json").read_text(encoding="utf-8"))
+    lock = json.loads((root / "config" / "booth-audit" / "model.json").read_text(encoding="utf-8"))
     target_url = _validated_url(raw_url.strip(), target_item=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     report_dir = runtime.reports / "booth-audit" / timestamp
