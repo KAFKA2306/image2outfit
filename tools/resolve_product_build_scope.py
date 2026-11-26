@@ -137,6 +137,19 @@ def _validate_namespace(job_path: str, job: dict[str, object]) -> str:
         value = job.get(field)
         if not isinstance(value, str) or not value.startswith(f"{expected_root}/"):
             raise ValueError(f"{field} must stay inside {expected_root}")
+    manufacturing_blend = job.get("manufacturingBlendPath")
+    if manufacturing_blend is not None:
+        expected_prefix = f".image2outfit/products/{product_id}/manufacturing/"
+        if (
+            not isinstance(manufacturing_blend, str)
+            or not manufacturing_blend.startswith(expected_prefix)
+            or not manufacturing_blend.endswith(".blend")
+            or "\\" in manufacturing_blend
+            or ".." in manufacturing_blend.split("/")
+        ):
+            raise ValueError(
+                "manufacturingBlendPath must stay in the product's local manufacturing directory"
+            )
     return product_id
 
 
@@ -219,7 +232,7 @@ def resolve(
         "CANDIDATE_DIR": f"{runtime}/candidate",
         "RELEASE_DIR": f"{runtime}/release",
         "BUILD_SCRIPT": str(job["buildScript"]),
-        "BLEND_PATH": str(job["blendPath"]),
+        "BLEND_PATH": str(job.get("manufacturingBlendPath", job["blendPath"])),
         "HOSTED_POSE_SCRIPT": str(job.get("hostedPoseScript", "")),
         "REQUEST_PATH": request_path,
         "CHECKPOINT_PATH": f"{runtime}/pipeline-state.json",

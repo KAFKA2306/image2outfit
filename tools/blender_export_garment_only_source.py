@@ -2,8 +2,8 @@
 """Write a garment-only editable Blender source from a weighted prototype.
 
 The input may contain the target avatar as a temporary measurement/weighting
-reference. The exported source retains the garment meshes and their armature,
-but removes all avatar reference meshes and unrelated scene objects.
+reference. The exported source retains only weighted garment meshes and named
+vertex groups, removing avatar geometry, rig objects, and linked image assets.
 """
 
 from __future__ import annotations
@@ -44,18 +44,28 @@ def require_local_workline(path: Path, product_id: str, label: str) -> None:
         raise ValueError(f"{label} must remain in the product's local workline: {path}")
 
 
+def require_product_source(path: Path, product_id: str, label: str) -> None:
+    source_root = (ROOT / "Assets" / "GenWorks" / product_id / "Source" / "Blender").resolve()
+    if path.parent != source_root or path.suffix.lower() != ".blend":
+        raise ValueError(f"{label} must be one .blend directly under {source_root}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--report", required=True)
     parser.add_argument("--product-id", required=True)
+    parser.add_argument("--allow-product-source-output", action="store_true")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :])
 
     source = repo_path(args.source)
     output = repo_path(args.output)
     report_path = repo_path(args.report)
-    require_local_workline(output, args.product_id, "output")
+    if args.allow_product_source_output:
+        require_product_source(output, args.product_id, "output")
+    else:
+        require_local_workline(output, args.product_id, "output")
     require_local_workline(report_path, args.product_id, "report")
     if not source.is_file():
         raise FileNotFoundError(f"weighted garment source is missing: {args.source}")
@@ -94,11 +104,17 @@ def main() -> int:
 
     garment_names = sorted(obj.name for obj in garment_meshes)
     removed_names = sorted(obj.name for obj in reference_meshes)
+    removed_object_count = sum(1 for obj in scene_objects if obj not in garment_meshes)
     for obj in scene_objects:
-        if obj.type == "MESH" and obj.get("prototypeRole") == PRIVATE_ROLE:
+        if obj not in garment_meshes:
             bpy.data.objects.remove(obj, do_unlink=True)
-        elif obj.type not in {"MESH", "ARMATURE"}:
-            bpy.data.objects.remove(obj, do_unlink=True)
+
+    # Retain named vertex groups (the exported weights) but remove links to the
+    # private avatar rig. Customers bind the garment to their own licensed rig.
+    for obj in garment_meshes:
+        for modifier in list(obj.modifiers):
+            if modifier.type == "ARMATURE":
+                obj.modifiers.remove(modifier)
 
     # Removing a Blender object can leave its mesh datablock orphaned. Purge all
     # unused mesh datablocks before saving, then verify the saved file itself.
@@ -108,8 +124,11 @@ def main() -> int:
 
     bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
     remaining_meshes = [obj for obj in bpy.data.objects if obj.type == "MESH"]
-    if len(remaining_meshes) != len(garment_meshes) or any(
-        obj.get("prototypeRole") not in GARMENT_ROLES for obj in remaining_meshes
+    remaining_non_meshes = [obj.name for obj in bpy.data.objects if obj.type != "MESH"]
+    if (
+        len(remaining_meshes) != len(garment_meshes)
+        or remaining_non_meshes
+        or any(obj.get("prototypeRole") not in GARMENT_ROLES for obj in remaining_meshes)
     ):
         raise ValueError("garment-only source validation failed after reference removal")
 
@@ -122,12 +141,18 @@ def main() -> int:
 
     bpy.ops.wm.open_mainfile(filepath=str(output), load_ui=False)
     saved_scene_meshes = [obj for obj in bpy.data.objects if obj.type == "MESH"]
-    saved_non_garment_objects = [
-        obj.name
-        for obj in bpy.data.objects
-        if obj.type not in {"MESH", "ARMATURE"}
-    ]
+    saved_non_garment_objects = [obj.name for obj in bpy.data.objects if obj.type != "MESH"]
     saved_orphan_meshes = [mesh.name for mesh in bpy.data.meshes if mesh.users == 0]
+    saved_referenced_images = [
+        image.name for image in bpy.data.images if image.name != "Render Result"
+    ]
+    saved_libraries = [library.filepath for library in bpy.data.libraries]
+    saved_armature_datablocks = len(bpy.data.armatures)
+    saved_weight_assignments = sum(
+        len(vertex.groups)
+        for obj in saved_scene_meshes
+        for vertex in obj.data.vertices
+    )
     saved_private_meshes = [
         obj.name
         for obj in saved_scene_meshes
@@ -138,13 +163,21 @@ def main() -> int:
         or saved_orphan_meshes
         or saved_private_meshes
         or saved_non_garment_objects
+        or saved_referenced_images
+        or saved_libraries
+        or saved_armature_datablocks
+        or saved_weight_assignments == 0
         or any(obj.get("prototypeRole") not in GARMENT_ROLES for obj in saved_scene_meshes)
+        or any(modifier.type == "ARMATURE" for obj in saved_scene_meshes for modifier in obj.modifiers)
+        or any(not obj.vertex_groups for obj in saved_scene_meshes)
     ):
         raise ValueError(
             "saved garment-only source failed reopen validation: "
             f"meshes={len(saved_scene_meshes)}, orphanMeshData={saved_orphan_meshes}, "
             f"avatarMeshes={saved_private_meshes}, "
-            f"otherObjects={saved_non_garment_objects}"
+            f"otherObjects={saved_non_garment_objects}, "
+            f"referencedImages={saved_referenced_images}, libraries={saved_libraries}, "
+            f"armatureData={saved_armature_datablocks}"
         )
 
     report = {
@@ -157,14 +190,19 @@ def main() -> int:
         "outputSha256": sha256(output),
         "garmentMeshCount": len(saved_scene_meshes),
         "garmentObjectNames": garment_names,
-        "removedAvatarReferenceMeshCount": len(removed_names),
+        "removedAvatarReferenceMeshCount": len(reference_meshes),
         "removedAvatarReferenceMeshNames": removed_names,
+        "removedNonGarmentObjectCount": removed_object_count - len(reference_meshes),
         "remainingMeshRoles": sorted({str(obj.get("prototypeRole")) for obj in saved_scene_meshes}),
         "savedOrphanMeshDatablocks": saved_orphan_meshes,
-        "savedArmatureCount": sum(
-            1 for obj in bpy.data.objects if obj.type == "ARMATURE"
-        ),
+        "savedArmatureCount": 0,
+        "savedArmatureDatablockCount": saved_armature_datablocks,
+        "savedVertexWeightAssignments": saved_weight_assignments,
+        "garmentVertexGroupsRetained": True,
+        "avatarRigBindingRemoved": True,
         "containsAvatarReferenceGeometry": False,
+        "containsReferencedImageAssets": False,
+        "containsLinkedLibraries": False,
         "grantsQualityAcceptance": False,
     }
     report_path.write_text(

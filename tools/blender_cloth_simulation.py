@@ -843,7 +843,7 @@ def _verify_component_mesh_in_blender(
 ) -> bool:
     if bpy is None:
         return False
-    blend_rel = job.get("blendPath")
+    blend_rel = job.get("manufacturingBlendPath", job.get("blendPath"))
     if not isinstance(blend_rel, str) or not blend_rel.strip():
         return False
     blend_path = repo_path(blend_rel, root=repo_root)
@@ -1185,7 +1185,7 @@ def rebind_component_bending(
     rebound_evidence["clothImplementationSha256"] = sha256_bytes(
         Path(__file__).read_bytes()
     )
-    blend_rel = job.get("blendPath")
+    blend_rel = job.get("manufacturingBlendPath", job.get("blendPath"))
     if isinstance(blend_rel, str) and blend_rel.strip():
         blend_path = repo_path(blend_rel, root=checked["root"])
         if blend_path.is_file():
@@ -1276,7 +1276,7 @@ def rebind_component_bending(
 def bake_sewn_prototype(job: dict[str, object]) -> int:
     """Run a bounded solve on attributed panels, preserving the input .blend."""
     _require_blender()
-    blend = repo_path(str(job["blendPath"]))
+    blend = repo_path(str(job.get("manufacturingBlendPath", job["blendPath"])))
     source_hash = hashlib.sha256(blend.read_bytes()).hexdigest()
     construction_path = repo_path(job["garmentPipeline"]["constructionPath"])
     construction = read_json(construction_path)
@@ -1596,7 +1596,7 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
         ):
             print(json.dumps(existing, ensure_ascii=False, indent=2))
             return 0
-    blend = repo_path(str(job["blendPath"]))
+    blend = repo_path(str(job.get("manufacturingBlendPath", job["blendPath"])))
     bpy.ops.wm.open_mainfile(filepath=str(blend), load_ui=False)
     armature = next(
         (obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"), None

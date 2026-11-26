@@ -1018,7 +1018,7 @@ def main():
     garment.data.materials.append(material)
     prototype_edge_trim = add_prototype_edge_trim(mesh, job, pieces, recipe)
     prototype_surface_motifs = add_prototype_surface_motifs(mesh, job, recipe)
-    source = resolve(job["blendPath"])
+    source = resolve(job.get("manufacturingBlendPath", job["blendPath"]))
     source.parent.mkdir(parents=True, exist_ok=True)
     # The workflow transaction owns rollback; avoid undeclared .blend1 writes.
     bpy.context.preferences.filepaths.save_version = 0

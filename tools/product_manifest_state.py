@@ -431,7 +431,6 @@ def record_workflow_attempt(
             "stageResultSha256": digest(result_file),
         }
 
-    checkpoint_rel = relative(root, checkpoint_path)
     terminal_record = stage_records[-1] if stage_records else None
     failed_record = (
         terminal_record
@@ -447,14 +446,6 @@ def record_workflow_attempt(
         raise ValueError("executed workflow checkpoint has no terminal PASS stage")
 
     last_passed_stage = completed[-1] if completed else None
-    if last_passed_stage:
-        last_result_path = stage_records_by_name[last_passed_stage]["resultPath"]
-        last_result_file = repo_path(root, last_result_path)
-        stage_evidence_path = relative(root, last_result_file)
-        stage_evidence_sha256 = digest(last_result_file)
-    else:
-        stage_evidence_path = checkpoint_rel
-        stage_evidence_sha256 = checkpoint_hash
 
     failed_stage = failed_record.get("stage") if failed_record else None
     failed_output = failed_record.get("output") if failed_record else None
@@ -474,13 +465,26 @@ def record_workflow_attempt(
         )
     elif failed_stage:
         next_action = (
-            f"Inspect the {failed_stage} failure in {checkpoint_rel}, resolve it, "
-            "then resume from this checkpoint."
+            f"Resolve the recorded {failed_stage} blocker, then resume the existing workflow."
+        )
+    elif pipeline_status == "EXECUTED":
+        existing_handoff = current.get("handoff", {})
+        existing_next_action = (
+            existing_handoff.get("nextAction")
+            if isinstance(existing_handoff, dict)
+            else None
+        )
+        next_action = (
+            existing_next_action
+            if isinstance(existing_next_action, str)
+            and existing_next_action.strip()
+            and ".image2outfit" not in existing_next_action
+            and "Assets/_Local" not in existing_next_action
+            else "Continue through the independent product-quality and release gates."
         )
     else:
         next_action = (
-            "Review the completed workflow checkpoint and continue through the "
-            "independent product-quality and release gates."
+            "Continue through the independent product-quality and release gates."
         )
 
     handoff = current.get("handoff")
@@ -488,10 +492,14 @@ def record_workflow_attempt(
         raise ValueError("ProductManifest handoff must be an object")
     updated = copy.deepcopy(current)
     updated_handoff = updated["handoff"]
-    updated_handoff["resumeFrom"] = checkpoint_rel
+    updated_handoff["resumeFrom"] = "canonical-workflow-checkpoint"
+    updated_handoff["checkpointAvailable"] = True
     updated_handoff["nextAction"] = next_action
+    completed_stage_status = {
+        stage: {"status": value["status"]}
+        for stage, value in completed_evidence.items()
+    }
     updated_handoff["lastAttempt"] = {
-        "runId": run_id,
         "status": (
             "PARTIAL" if pipeline_status == "FAILED" and completed else pipeline_status
         ),
@@ -500,19 +508,17 @@ def record_workflow_attempt(
         .replace("+00:00", "Z"),
         "visualAppearanceReview": visual_status,
         "lastPassedStage": last_passed_stage,
-        "stageEvidence": stage_evidence_path,
-        "stageEvidenceSha256": stage_evidence_sha256,
-        "completedStages": completed_evidence,
+        "completedStages": completed_stage_status,
         "contractResult": (
             f"Workflow {pipeline_status}; completed {len(completed)} stage(s)."
         ),
-        "failedAttemptEvidencePaths": (
-            [checkpoint_rel] if pipeline_status == "FAILED" else []
-        ),
-        "checkpointPath": checkpoint_rel,
-        "checkpointSha256": checkpoint_hash,
+        "failedAttemptEvidenceAvailable": pipeline_status == "FAILED",
         "blockedStage": failed_stage,
-        "failure": failure_message,
+        "failureCode": (
+            failed_output.get("errorType")
+            if isinstance(failed_output, dict)
+            else None
+        ),
         "nextAction": next_action,
     }
 
@@ -556,17 +562,44 @@ def record_workflow_attempt(
                     != report["canonicalInputs"][hash_field]
                 ):
                     raise ValueError("sewn prototype canonical inputs are stale")
+            public_source: dict[str, str] | None = None
+            if "skin-and-export" in completed:
+                skin_result_path = repo_path(
+                    root, stage_records_by_name["skin-and-export"]["resultPath"]
+                )
+                skin_result = read_json(skin_result_path)
+                safe_source = next(
+                    (
+                        item
+                        for item in skin_result.get("evidence", [])
+                        if item.get("path") == job.get("blendPath")
+                    ),
+                    None,
+                )
+                if (
+                    skin_result.get("status") == "PASS"
+                    and skin_result.get("garmentOnlySource") is True
+                    and skin_result.get("avatarGeometryExcluded") is True
+                    and skin_result.get("avatarRigBindingExcluded") is True
+                    and isinstance(safe_source, dict)
+                    and digest(repo_path(root, safe_source["path"]))
+                    == safe_source.get("sha256")
+                ):
+                    public_source = {
+                        "sourcePath": safe_source["path"],
+                        "sourceSha256": safe_source["sha256"],
+                    }
             updated_handoff["manufacturingPrototype"] = {
                 "stage": "build-blender",
                 "executionDisposition": build_result.get("executionDisposition"),
                 "qualityDecision": build_result.get("qualityDecision"),
-                "sourcePath": sources[0]["path"],
-                "sourceSha256": sources[0]["sha256"],
                 "reportPath": reports[0]["path"],
                 "reportSha256": reports[0]["sha256"],
                 "metrics": report.get("metrics"),
                 "grantsQualityAcceptance": False,
             }
+            if public_source is not None:
+                updated_handoff["manufacturingPrototype"].update(public_source)
             updated_handoff.pop("manufacturingFailure", None)
             updated_handoff.pop("environmentFailure", None)
             if failed_stage == "simulate-cloth":

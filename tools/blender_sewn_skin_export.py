@@ -119,7 +119,8 @@ def main():
     candidate = repo_path(cloth["candidatePath"])
     if digest(candidate) != cloth["candidateSha256"]:
         raise ValueError("cloth candidate is stale")
-    if digest(repo_path(job["blendPath"])) != cloth["sourceBlendSha256"]:
+    manufacturing_blend = job.get("manufacturingBlendPath", job["blendPath"])
+    if digest(repo_path(manufacturing_blend)) != cloth["sourceBlendSha256"]:
         raise ValueError("cloth source binding is stale")
     bpy.ops.wm.open_mainfile(filepath=str(candidate), load_ui=False)
     if len(cloth["collisionObjects"]) != 1:

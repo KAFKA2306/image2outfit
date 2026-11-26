@@ -517,13 +517,30 @@ def parse_improvement_projection(
     ):
         if not path_text:
             continue
-        target = root / str(path_text)
+        relative = Path(str(path_text))
+        if relative.is_absolute() or any(
+            part in {".image2outfit", "Assets/_Local"}
+            for part in relative.parts
+        ):
+            continue
+        target = (root / relative).resolve()
+        workspace_root = (root / "Assets" / "GenWorks" / slug).resolve()
+        if workspace_root not in target.parents:
+            continue
+        if not target.is_file():
+            continue
+        try:
+            content = target.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        if ".image2outfit" in content or "Assets/_Local" in content:
+            continue
         evidence.append(
             Evidence(
                 label=label,
-                status="PASS" if target.is_file() else "MISSING",
-                href=relative_href(target, output_dir) if target.is_file() else None,
-                sha256=digest(target) if target.is_file() else None,
+                status="PASS",
+                href=relative_href(target, output_dir),
+                sha256=digest(target),
             )
         )
     resume = next_action if next_action not in {"NONE", "NOT_RUN"} else None

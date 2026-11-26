@@ -145,6 +145,17 @@ def validate_job(job: dict[str, Any], policy: dict[str, Any], root: Path) -> lis
             if error:
                 errors.append(error)
 
+        manufacturing_blend = job.get("manufacturingBlendPath")
+        if manufacturing_blend is not None:
+            error = _owned_path_error(
+                root=root,
+                value=manufacturing_blend,
+                owner=f".image2outfit/products/{product_id}/manufacturing",
+                field="manufacturingBlendPath",
+            )
+            if error:
+                errors.append(error)
+
         delivery_assets = job.get("deliveryAssets")
         if isinstance(delivery_assets, list):
             for index, value in enumerate(delivery_assets):

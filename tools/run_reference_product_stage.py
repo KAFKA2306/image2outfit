@@ -1970,7 +1970,10 @@ def stage_build(
         report_payload is not None
         and report_payload.get("buildInvocationId") == build_invocation_id
     )
-    blend = repo_path(job["blendPath"], label="blend")
+    blend = repo_path(
+        job.get("manufacturingBlendPath", job["blendPath"]),
+        label="manufacturing blend",
+    )
     blend_fresh = (
         blend.is_file()
         and report_payload is not None
@@ -2095,7 +2098,10 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     candidate_paths = []
     if simulation_log is not None:
         if payload.get("sourceBlendSha256") != sha256(
-            repo_path(job["blendPath"], label="blend")
+            repo_path(
+                job.get("manufacturingBlendPath", job["blendPath"]),
+                label="manufacturing blend",
+            )
         ) or payload.get("constructionSha256") != sha256(
             repo_path(job["garmentPipeline"]["constructionPath"], label="construction")
         ):
@@ -2144,7 +2150,10 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     if not isinstance(contracts, list):
         raise ValueError("cloth report contracts must be a list")
 
-    blend = repo_path(job["blendPath"], label="blend")
+    blend = repo_path(
+        job.get("manufacturingBlendPath", job["blendPath"]),
+        label="manufacturing blend",
+    )
     if applicability == "REQUIRED":
         expected_components = policy.get("components")
         if (
@@ -2250,13 +2259,70 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
             or sha256(fbx) != report["fbxSha256"]
         ):
             raise ValueError("skin/export artifact binding mismatch")
+        garment_source_report = runtime_root(product_id) / "workline/garment-only-editable-report.json"
+        garment_source_report.parent.mkdir(parents=True, exist_ok=True)
+        sanitize_command = [
+            blender_executable(),
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            _path_argument_for_executable(
+                blender_executable(), ROOT / "tools/blender_export_garment_only_source.py"
+            ),
+            "--",
+            "--source",
+            _path_argument_for_executable(blender_executable(), source),
+            "--output",
+            _path_argument_for_executable(
+                blender_executable(), repo_path(job["blendPath"], label="product Blender source")
+            ),
+            "--report",
+            _path_argument_for_executable(blender_executable(), garment_source_report),
+            "--product-id",
+            product_id,
+            "--allow-product-source-output",
+        ]
+        sanitized = subprocess.run(
+            sanitize_command, cwd=ROOT, capture_output=True, text=True, check=False
+        )
+        log.write_text(
+            log.read_text(encoding="utf-8")
+            + "\n--- GARMENT-ONLY SOURCE EXPORT ---\n"
+            + sanitized.stdout
+            + "\n--- STDERR ---\n"
+            + sanitized.stderr,
+            encoding="utf-8",
+        )
+        if sanitized.returncode:
+            raise RuntimeError(
+                f"Garment-only editable source export failed: {sanitized.stderr[-2500:]}"
+            )
+        garment_source = repo_path(job["blendPath"], label="garment-only product source")
+        garment_source_evidence = read_object(garment_source_report, "garment-only source report")
+        if (
+            garment_source_evidence.get("status") != "GARMENT_ONLY_SOURCE_WRITTEN"
+            or garment_source_evidence.get("containsAvatarReferenceGeometry") is not False
+            or garment_source_evidence.get("containsReferencedImageAssets") is not False
+            or garment_source_evidence.get("containsLinkedLibraries") is not False
+            or garment_source_evidence.get("savedArmatureDatablockCount") != 0
+            or not garment_source_evidence.get("garmentVertexGroupsRetained")
+            or garment_source_evidence.get("savedVertexWeightAssignments", 0) <= 0
+            or sha256(garment_source) != garment_source_evidence.get("outputSha256")
+            or garment_source_evidence.get("savedArmatureCount") != 0
+        ):
+            raise ValueError("garment-only source evidence failed reopen/hash verification")
         emit(
             result,
             stage="skin-and-export",
             product_id=product_id,
-            paths=[source, fbx, report_path, log],
+            paths=[source, garment_source, fbx, report_path, garment_source_report, log],
             extra={
                 "editableSource": True,
+                "garmentOnlySource": True,
+                "avatarGeometryExcluded": True,
+                "avatarRigBindingExcluded": True,
                 "fbxExported": True,
                 "prefabDeclared": False,
                 "qualityDecision": "UNVERIFIED",
