@@ -20,18 +20,18 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "code": "SHORTS_POSE_COVERAGE",
-      "description": "Directly inspected the current front, back, left, right, three-quarter views and all six required poses. In neutral and arms-up, a central segmented pale panel is visibly exposed below the overskirt; the crouch shows strong thigh/body exposure and split cloth; sit retains exposed thigh and detached/angular rear cloth. The longer shaped-hem draft was built and simulated, but the visual result remains unacceptable. This is prototype appearance evidence only; garment ease, fit, Shape Key behavior, strain and runtime are not accepted."
+      "description": "Direct inspection of the current five views and six poses: neutral and arms-up still show a pale vertically segmented center strip projecting below the overskirt. Crouch shows exposed avatar thigh and separated angular cloth between the legs; sit shows exposed thigh and collapsed rear skirt panels. Joining the lower front/back rise seams did not yield a clean continuous shorts appearance. Garment coverage, ease, fit, deformation and runtime are unaccepted.",
+      "code": "SHORTS_CROTCH_AND_POSE_COVERAGE"
     },
     {
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "Directly inspected all current views and poses. Standing skirt remains broad and irregular rather than clearly pleated. Crouch and sit show curled and angular rear/between-leg panels; prone is collapsed into a blocky sheet. Cloth simulation completed, but pose appearance is rejected."
+      "description": "The standing overskirt is broad and irregular rather than clearly pleated. Crouch and sit have curled, separated angular panels behind/between the thighs, and prone collapses into a blocky sheet. Cloth simulation ran, but these poses remain visually rejected.",
+      "code": "OVERSKIRT_POSE_COLLAPSE"
     },
     {
       "severity": "BLOCKER",
-      "code": "JACKET_SURFACE_QUALITY",
-      "description": "Directly inspected all current views and poses. The collar remains a tall open cylindrical rim. Sleeves and underarm transitions are visibly faceted and heavily wrinkled, including arms-up and crossed-arm. No measured fit, clearance, strain, or runtime acceptance."
+      "description": "The high collar remains a tall open cylindrical rim; sleeves and underarm transitions are heavily faceted and wrinkled in neutral, arms-up and arm-cross views. No measured fit, clearance, strain, Shape Key or runtime acceptance.",
+      "code": "JACKET_SURFACE_QUALITY"
     }
   ],
   "failedGeometryChecks": [

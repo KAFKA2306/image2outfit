@@ -2610,61 +2610,6 @@
       "garmentSide": "back",
       "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
       "constructionStatus": "PROVISIONAL_MEASURED_NEUTRAL_WAISTBAND"
-    },
-    {
-      "pieceId": "shorts-thigh-wrap",
-      "partId": "fitted-short",
-      "boundary": [
-        [
-          0.0,
-          0.103923048
-        ],
-        [
-          0.1,
-          0.0
-        ],
-        [
-          0.0,
-          -0.103923048
-        ],
-        [
-          -0.1,
-          0.0
-        ]
-      ],
-      "cutCount": 1,
-      "onFold": false,
-      "grainAngleDegrees": 0,
-      "seamAllowanceM": 0.0,
-      "edges": [
-        {
-          "edgeId": "front-right",
-          "startVertex": 0,
-          "endVertex": 1,
-          "role": "seam"
-        },
-        {
-          "edgeId": "right-back",
-          "startVertex": 1,
-          "endVertex": 2,
-          "role": "seam"
-        },
-        {
-          "edgeId": "back-left",
-          "startVertex": 2,
-          "endVertex": 3,
-          "role": "seam"
-        },
-        {
-          "edgeId": "left-front",
-          "startVertex": 3,
-          "endVertex": 0,
-          "role": "seam"
-        }
-      ],
-      "garmentFacing": "inner-thigh-wrap",
-      "wearerSide": "center",
-      "measurementStatus": "UNMEASURED_BROADER_CONTINUOUS_INNER_THIGH_WRAP_HYPOTHESIS"
     }
   ],
   "method": {
@@ -2685,8 +2630,8 @@
     },
     {
       "item": "shorts rise, crotch, thigh sections, and shape-key response",
-      "status": "continuous-inner-thigh-wrap-unverified",
-      "decision": "The prior equal-edge diamond left inner-thigh exposure. Replace it with a single continuous vertically elongated panel (240 mm by 160 mm in flat coordinates), retaining the same four 0.1442 m sewn edges and current centerline rise. This is a new pattern-shape hypothesis, not approved fit or coverage; rendered poses must be inspected."
+      "status": "direct-rise-seams-unverified",
+      "decision": "Remove the separate cross-thigh insert. Sew the lower rise edge of the two front panels together and the lower rise edge of the two back panels together, continuous with their existing upper center seams. The four 0.144222 m lower-rise edges become two paired center seams; no separate gusset/overlay panel remains. This topology experiment is not fit, ease, coverage, opacity, or pose acceptance."
     },
     {
       "item": "jacket plastron, elbow quilting, piping, and back tab",
@@ -2694,5 +2639,5 @@
       "decision": "The two front contours include the diagonal overlap silhouette; elbow quilting, lavender trim, and back adjustment tab remain separate surface/edge details outside this panel graph."
     }
   ],
-  "rationale": "Replace the rejected diamond crotch gusset with one continuous, vertically elongated inner-thigh wrap panel. Preserve all four 0.1442 m sewn boundaries while changing the flat pattern aspect to a 240 mm longitudinal by 160 mm transverse rhombus; this tests coverage reach along the inner thighs without increasing seam lengths. The silhouette, cloth response, coverage, opacity, fit, and pose behavior remain unmeasured and unapproved."
+  "rationale": "Replace the four-seam diamond/wrap insert with a joined four-panel shorts body. Continue the front-left/front-right center rise seam through the lower-rise edges and independently continue the back-left/back-right center rise seam, while retaining each leg’s existing outseams and inseams. This closes the crotch through the garment body panels rather than a distinct cross-thigh panel; 3D coverage, cloth response, fit, and motion remain unmeasured."
 }

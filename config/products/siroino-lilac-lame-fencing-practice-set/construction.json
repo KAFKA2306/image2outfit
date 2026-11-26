@@ -20,8 +20,7 @@
     "shorts-back-right",
     "jacket-elbow-quilt-overlay",
     "waistband-front",
-    "waistband-back",
-    "shorts-thigh-wrap"
+    "waistband-back"
   ],
   "requiredPatternComponents": [
     {
@@ -56,10 +55,9 @@
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
-        "shorts-back-right",
-        "shorts-thigh-wrap"
+        "shorts-back-right"
       ],
-      "reason": "Prototype hypothesis: retain the continuous inner-thigh wrap and draft longer front/back shorts legs with an eight-segment shaped hem that drops 60 mm at the inner edge and 15 mm at the outer edge. Keep the paired front/back outseam and inseam coordinates identical, and preserve the four 144.222 mm wrap-rise attachments. This is an unmeasured coverage/construction hypothesis; ease, silhouette, cloth response, fit, and all pose behavior remain unapproved."
+      "reason": "Prototype topology trial: remove the four-edge inner-thigh bridge panel. Close the lower center-front rise by sewing shorts-front-left to shorts-front-right, and close the lower center-back rise by sewing shorts-back-left to shorts-back-right. The four integrated front/back leg panels then form the crotch and inseams without a separate cross-thigh insert. Edge continuity, ease, coverage, silhouette, cloth response, fit, and pose behavior are unmeasured and unapproved."
     }
   ],
   "separateGeometry": [
@@ -118,13 +116,13 @@
     },
     "prototypeFrameEnd": 16,
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
-    "reason": "The 160 mm-wide by 240 mm-long equal-edge wrap remained visibly narrow at the inter-thigh bridge in current crouch/sit renders despite stronger neutral-surface placement. This prototype redistributes each unchanged 144.222 mm sewn edge into a 200 mm-wide by 207.846 mm-long wrap. Rebuild and directly inspect current renders; this hypothesis grants no coverage, fit, Shape Key, opacity, pose or release acceptance.",
+    "reason": "A separate inner-thigh insert remained visibly exposed and did not close crouch/sit coverage. This candidate removes the insert and directly joins the paired front and back lower-rise seams; skirt cloth evidence is separately rebound only for unchanged skirt construction. No shorts coverage, fit or pose acceptance is claimed.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-011fdb059fbfae61.json",
-        "evidenceSha256": "011fdb059fbfae618aa9525e3b174d8eeb25c55c47fca2379ea1da5e59842236",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20, rebound from baseline 61af578 (9555861ec9de9bd7) after verifying component and stitched-seam invariance. Diagnostic geometry only; no fit, pose, or visual acceptance."
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-6d9919669903cb12.json",
+        "evidenceSha256": "6d9919669903cb12d00e40abc35fe392970ac63f4074b1972911a8fce0fb13ad",
+        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20, rebound from baseline 48668b4 (011fdb059fbfae61) after verifying component and stitched-seam invariance. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
   },
@@ -149,8 +147,7 @@
         "shorts-back-left",
         "shorts-back-right",
         "waistband-front",
-        "waistband-back",
-        "shorts-thigh-wrap"
+        "waistband-back"
       ],
       "bodyTriangleZM": [
         0.42,
@@ -186,8 +183,7 @@
             "shorts-front-left",
             "shorts-front-right",
             "shorts-back-left",
-            "shorts-back-right",
-            "shorts-thigh-wrap"
+            "shorts-back-right"
           ],
           "hipBone": "Hips",
           "leftThighBone": "UpperLeg_L",
@@ -196,23 +192,7 @@
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
           "fullSideWeightWidthM": 0.06,
-          "interiorThighBoostExperiment": {
-            "method": "sewn-boundary-geodesic-fade-v1",
-            "pieceId": "shorts-thigh-wrap",
-            "neighborPieceIds": [
-              "shorts-front-left",
-              "shorts-front-right",
-              "shorts-back-left",
-              "shorts-back-right"
-            ],
-            "boostWeight": 0.12,
-            "maximumThighWeight": 0.65,
-            "taperEdgeRings": 3,
-            "expectedBoundaryVertexCount": 60,
-            "expectedInteriorVertexCount": 230,
-            "evidenceBoundary": "Controlled component-only prototype experiment prompted by crouch/sit wrap-to-body gaps. Adds up to 0.12 same-side thigh influence only to shorts-thigh-wrap vertices, smoothly ramped over three topological rings inward from the four shared sewn boundaries; preserves baseline profile at all 60 shared boundary vertices and leaves other garment pieces unchanged. Diagnostic candidate only; no fit, coverage, penetration, appearance or runtime acceptance."
-          },
-          "evidenceBoundary": "Prototype hip/thigh weighting region includes the continuous inner-thigh wrap panel alongside the four shorts panels. Weight response and coverage remain unmeasured; no pose, fit, penetration, deformation, Shape Key or runtime acceptance."
+          "evidenceBoundary": "Prototype hip/thigh weighting applies to the four joined shorts body panels only. The former separate inner-thigh insert and its interior-only boost have been removed; weight response, coverage, pose deformation and fit remain unmeasured."
         }
       ]
     }

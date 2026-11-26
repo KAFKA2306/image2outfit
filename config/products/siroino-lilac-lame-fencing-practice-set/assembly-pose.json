@@ -8925,19 +8925,6 @@
         ],
         "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
       }
-    },
-    "shorts-thigh-wrap": {
-      "rotationDegreesXYZ": [
-        90,
-        0,
-        0
-      ],
-      "translationM": [
-        0.0,
-        0.599578,
-        0.0
-      ],
-      "evidenceBoundary": "Continuous inner-thigh wrap placement hypothesis: same crotch anchor and 90-degree pattern-plane rotation; the panel now spans 240 mm along the inner-thigh axis and 160 mm transversely with unchanged 0.1442 m sewn boundaries. Placement, coverage, strain, penetration, pose deformation, Shape Keys and fit remain unverified."
     }
   },
   "placementEvidence": [
@@ -9053,8 +9040,7 @@
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
-        "shorts-back-right",
-        "shorts-thigh-wrap"
+        "shorts-back-right"
       ],
       "bodyMeshNamePrefix": "SiroinoSotai_PC",
       "fadeStartZM": 0.38,
@@ -9067,14 +9053,14 @@
       "outerPieceId": "__none__",
       "outerLayerOffsetM": 0,
       "maximumBlendWeight": 0.95,
-      "evidenceBoundary": "Prototype shorts tracking hypothesis based on the current weighted mesh: the continuous inner-thigh wrap has 264 selected vertices, a mean neutral body-surface distance of 24.04 mm, a 57.42 mm 95th percentile, and a 79.17 mm maximum. Retain the 85 mm hard projection bound and 4 mm normal offset, but raise the bounded projection blend from 0.85 to 0.95 to reduce residual displacement on these measured vertices while preserving shared sewn vertices as single owners. The unchanged collapse rejection and seam checks remain authoritative. This is a local placement hypothesis, not an appearance, fit, clearance, opacity, pose, strain, Shape Key, or runtime acceptance threshold."
+      "evidenceBoundary": "Bounded placement hypothesis for the four actual shorts body panels only. The former separate inner-thigh insert is removed; nearest-surface placement preserves the submitted garment panels and does not substitute avatar geometry. Projection limits are construction aids, not fit or coverage acceptance."
     }
   },
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",
     "leftAxis": "GarmentCode +X = Blender +X",
-    "method": "Centerline lower-rise seams retained; redistribute the four equal 0.144222 m seams into a 207.846 mm longitudinal by 200 mm transverse continuous inner-thigh wrap panel after the narrower 240 mm by 160 mm version remained visibly open in crouch/sit.",
-    "evidenceBoundary": "The panel redistributes span toward the transverse inter-thigh bridge without changing any sewn edge length. Panel orientation and 3D coverage remain a prototype hypothesis; no fit, opacity, motion, penetration, cloth or Shape Key acceptance."
+    "method": "Four-panel shorts body with direct center-front and center-back rise seams. The lower crotch-rise edges of front-left/front-right and back-left/back-right are paired directly; the separate cross-thigh bridge panel is removed.",
+    "evidenceBoundary": "The joined rise topology closes the former four-edge opening using the garment panels. Panel orientation and continuous 3D coverage are prototype hypotheses; no fit, ease, opacity, motion, penetration, cloth, Shape Key or runtime acceptance."
   },
   "skirtEnvelopePlacement": {
     "method": "measured-horizontal-body-envelope-minimum-clearance",
