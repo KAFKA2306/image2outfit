@@ -153,13 +153,24 @@ def main():
             raise ValueError("Explicit prototype weight profiles must be a list")
         for profile in profiles:
             profile_piece_ids = set(profile["pieceIds"])
-            if (profile["method"] != "hip-anchored-lateral-thigh-fade-v1"
+            if (profile["method"] not in {
+                        "hip-anchored-lateral-thigh-fade-v1",
+                        "hip-anchored-bilateral-center-fade-v2",
+                    }
                     or not profile_piece_ids
                     or not profile_piece_ids.issubset(set(region["pieceIds"]))
                     or not 0 <= profile["waistThighWeight"] <= profile["hemThighWeight"] <= 1
                     or profile["centerlineHalfWidthM"] < 0
                     or profile["fullSideWeightWidthM"] <= profile["centerlineHalfWidthM"]):
                 raise ValueError("Invalid explicit prototype weight profile")
+            centerline_fraction = profile.get("centerlineThighWeightFraction", 0.0)
+            if (not math.isfinite(centerline_fraction)
+                    or not 0 <= centerline_fraction <= 1
+                    or (profile["method"] == "hip-anchored-bilateral-center-fade-v2"
+                        and "centerlineThighWeightFraction" not in profile)
+                    or (profile["method"] == "hip-anchored-lateral-thigh-fade-v1"
+                        and centerline_fraction != 0.0)):
+                raise ValueError("Invalid centerline thigh-weight fraction for prototype profile")
             for bone_name in (profile["hipBone"], profile["leftThighBone"], profile["rightThighBone"]):
                 if bone_name not in bones:
                     raise ValueError(f"Prototype weight profile bone is missing or non-deform: {bone_name}")
@@ -238,6 +249,8 @@ def main():
                 "vertexCount": 0,
                 "thighWeights": [],
                 "centerlineVertexCount": 0,
+                "bilateralCenterlineVertexCount": 0,
+                "bilateralCenterlineThighWeights": [],
                 "leftSideVertexCount": 0,
                 "rightSideVertexCount": 0,
                 "interiorBoostRecords": [],
@@ -288,20 +301,50 @@ def main():
                 base_thigh = (profile["waistThighWeight"]
                               + (profile["hemThighWeight"]-profile["waistThighWeight"])*hem_fraction)
                 lateral = abs(point.x-center_x)
+                bilateral_mode = profile["method"] == "hip-anchored-bilateral-center-fade-v2"
+                is_bilateral_centerline = (
+                    bilateral_mode and lateral <= profile["centerlineHalfWidthM"]
+                )
                 lateral_fraction = ((lateral-profile["centerlineHalfWidthM"])
                                     / (profile["fullSideWeightWidthM"]-profile["centerlineHalfWidthM"]))
-                thigh_weight = base_thigh * _smoothstep(lateral_fraction)
-                if point.x > center_x:
+                if is_bilateral_centerline:
+                    thigh_weight = base_thigh * profile.get("centerlineThighWeightFraction", 0.0)
+                    thigh_bone = None
+                    opposite_thigh_bone = None
+                    profile_accumulators[profile_key]["centerlineVertexCount"] += 1
+                    profile_accumulators[profile_key]["bilateralCenterlineVertexCount"] += 1
+                    profile_accumulators[profile_key]["bilateralCenterlineThighWeights"].append(thigh_weight)
+                elif lateral <= profile["centerlineHalfWidthM"]:
+                    thigh_weight = 0.0
+                    thigh_bone = profile["hipBone"]
+                    opposite_thigh_bone = None
+                    profile_accumulators[profile_key]["centerlineVertexCount"] += 1
+                elif point.x > center_x:
+                    side_fraction = _smoothstep(lateral_fraction)
                     thigh_bone = profile["leftThighBone"] if left_is_positive_x else profile["rightThighBone"]
+                    opposite_thigh_bone = profile["rightThighBone"] if left_is_positive_x else profile["leftThighBone"]
+                    if bilateral_mode:
+                        centerline_fraction = profile["centerlineThighWeightFraction"]
+                        thigh_weight = base_thigh * (
+                            centerline_fraction + (1.0-centerline_fraction)*side_fraction
+                        )
+                    else:
+                        thigh_weight = base_thigh * side_fraction
                     profile_accumulators[profile_key]["leftSideVertexCount"] += int(left_is_positive_x)
                     profile_accumulators[profile_key]["rightSideVertexCount"] += int(not left_is_positive_x)
-                elif point.x < center_x:
+                else:
+                    side_fraction = _smoothstep(lateral_fraction)
                     thigh_bone = profile["rightThighBone"] if left_is_positive_x else profile["leftThighBone"]
+                    opposite_thigh_bone = profile["leftThighBone"] if left_is_positive_x else profile["rightThighBone"]
+                    if bilateral_mode:
+                        centerline_fraction = profile["centerlineThighWeightFraction"]
+                        thigh_weight = base_thigh * (
+                            centerline_fraction + (1.0-centerline_fraction)*side_fraction
+                        )
+                    else:
+                        thigh_weight = base_thigh * side_fraction
                     profile_accumulators[profile_key]["rightSideVertexCount"] += int(left_is_positive_x)
                     profile_accumulators[profile_key]["leftSideVertexCount"] += int(not left_is_positive_x)
-                else:
-                    thigh_bone = profile["hipBone"]
-                    profile_accumulators[profile_key]["centerlineVertexCount"] += 1
                 taper = interior_tapers.get(profile_key)
                 if (taper is not None
                         and vertex.index in taper["targetVertices"]):
@@ -320,7 +363,20 @@ def main():
                         "baselineThighWeight": baseline_thigh_weight,
                         "candidateThighWeight": thigh_weight,
                     })
-                if thigh_weight > 0:
+                if is_bilateral_centerline and thigh_weight > 0:
+                    raw[vertex.index] = [
+                        (profile["hipBone"], 1.0-thigh_weight),
+                        (profile["leftThighBone"], thigh_weight/2.0),
+                        (profile["rightThighBone"], thigh_weight/2.0),
+                    ]
+                elif bilateral_mode and thigh_weight > 0:
+                    opposite_share = 0.5 * (1.0-_smoothstep(lateral_fraction))
+                    raw[vertex.index] = [
+                        (profile["hipBone"], 1.0-thigh_weight),
+                        (thigh_bone, thigh_weight*(1.0-opposite_share)),
+                        (opposite_thigh_bone, thigh_weight*opposite_share),
+                    ]
+                elif thigh_weight > 0:
                     raw[vertex.index] = [(profile["hipBone"], 1.0-thigh_weight), (thigh_bone, thigh_weight)]
                 else:
                     raw[vertex.index] = [(profile["hipBone"], 1.0)]
@@ -349,11 +405,24 @@ def main():
                     "pieceIds": accumulator["profile"]["pieceIds"],
                     "measuredMeshZRangeM": list(profile_bounds[key]),
                     "centerlineHalfWidthM": accumulator["profile"]["centerlineHalfWidthM"],
+                    "centerlineThighWeightFraction": accumulator["profile"].get(
+                        "centerlineThighWeightFraction", 0.0
+                    ),
                     "fullSideWeightWidthM": accumulator["profile"]["fullSideWeightWidthM"],
                     "waistThighWeight": accumulator["profile"]["waistThighWeight"],
                     "hemThighWeight": accumulator["profile"]["hemThighWeight"],
                     "vertexCount": accumulator["vertexCount"],
                     "centerlineVertexCount": accumulator["centerlineVertexCount"],
+                    "bilateralCenterlineVertexCount": accumulator["bilateralCenterlineVertexCount"],
+                    "bilateralCenterlineThighWeight": (
+                        {
+                            "minimum": min(accumulator["bilateralCenterlineThighWeights"]),
+                            "mean": sum(accumulator["bilateralCenterlineThighWeights"])
+                                    / len(accumulator["bilateralCenterlineThighWeights"]),
+                            "maximum": max(accumulator["bilateralCenterlineThighWeights"]),
+                        }
+                        if accumulator["bilateralCenterlineThighWeights"] else None
+                    ),
                     "leftSideVertexCount": accumulator["leftSideVertexCount"],
                     "rightSideVertexCount": accumulator["rightSideVertexCount"],
                     "measuredThighWeight": {

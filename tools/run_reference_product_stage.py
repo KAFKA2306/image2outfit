@@ -2066,34 +2066,107 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         simulation_log = runtime_root(product_id) / "reports" / "cloth-simulation.log"
         simulation_log.parent.mkdir(parents=True, exist_ok=True)
-        blender = blender_executable()
-        command = [
-            blender,
-            "--background",
-            "--factory-startup",
-            "--python-exit-code",
-            "1",
-            "--python",
-            _path_argument_for_executable(
-                blender, ROOT / "tools/blender_cloth_simulation.py"
-            ),
-            "--",
-            "--job",
-            _path_argument_for_executable(
-                blender, ROOT / "config/products" / product_id / "job.json"
-            ),
-            "--prototype",
-        ]
-        execution = subprocess.run(
-            command, cwd=ROOT, capture_output=True, text=True, check=False
+        blend_path = repo_path(
+            job.get("manufacturingBlendPath", job["blendPath"]),
+            label="manufacturing blend",
         )
-        simulation_log.write_text(
-            execution.stdout + "\n" + execution.stderr, encoding="utf-8"
+        construction_path = repo_path(
+            job["garmentPipeline"]["constructionPath"], label="construction"
         )
-        if execution.returncode:
-            raise RuntimeError(
-                f"Native sewn cloth solve failed; see {relative(simulation_log)}: {execution.stderr[-2500:]}"
+        source_blend_sha = sha256(blend_path)
+        construction_sha = sha256(construction_path)
+        reusable = False
+        if report.is_file():
+            try:
+                prior = read_object(report, "cloth simulation report")
+                candidate = repo_path(prior["candidatePath"], label="cloth candidate")
+                reusable = (
+                    prior.get("status") == "PASS"
+                    and prior.get("cacheBaked") is True
+                    and prior.get("qualityDecision") == "UNVERIFIED"
+                    and prior.get("grantsFitAcceptance") is False
+                    and prior.get("sourceBlendSha256") == source_blend_sha
+                    and prior.get("constructionSha256") == construction_sha
+                    and candidate.is_file()
+                    and sha256(candidate) == prior.get("candidateSha256")
+                )
+                if reusable:
+                    construction = read_object(construction_path, "construction")
+                    cloth_policy = construction["clothSimulation"]
+                    current_inputs = {
+                        "assemblyPoseSha256": sha256(
+                            repo_path(
+                                job["garmentPipeline"]["assemblyPosePath"],
+                                label="assembly pose",
+                            )
+                        ),
+                        "patternSha256": sha256(
+                            repo_path(
+                                job["garmentPipeline"]["patternContractPath"],
+                                label="pattern contract",
+                            )
+                        ),
+                        "targetSourceSha256": sha256(
+                            repo_path(job["targetSourcePath"], label="target source")
+                        ),
+                    }
+                    measurement = prior.get("bendingRemeasurement")
+                    if measurement is not None:
+                        declared = cloth_policy["prototypeComponentBending"][
+                            measurement["component"]
+                        ]
+                        evidence_path = repo_path(
+                            measurement["evidencePath"], label="remeasured bending evidence"
+                        )
+                        evidence = read_object(evidence_path, "remeasured bending evidence")
+                        reusable = (
+                            evidence_path.is_file()
+                            and sha256(evidence_path) == measurement["evidenceSha256"]
+                            and declared.get("evidencePath") == measurement["evidencePath"]
+                            and declared.get("evidenceSha256") == measurement["evidenceSha256"]
+                            and evidence.get("cacheBaked") is True
+                            and evidence.get("grantsFitAcceptance") is False
+                            and evidence.get("grantsVisualAcceptance") is False
+                            and evidence.get("frameEnd") == cloth_policy.get("prototypeFrameEnd")
+                            and all(evidence.get(key) == value for key, value in current_inputs.items())
+                            and evidence.get("bendingStiffness") == declared.get("stiffness")
+                        )
+                    if reusable:
+                        simulation_log.write_text(
+                            "Reused hash-bound native cloth solve; source, construction, candidate, and measurement evidence verified.\n",
+                            encoding="utf-8",
+                        )
+            except (KeyError, OSError, TypeError, ValueError):
+                reusable = False
+        if not reusable:
+            blender = blender_executable()
+            command = [
+                blender,
+                "--background",
+                "--factory-startup",
+                "--python-exit-code",
+                "1",
+                "--python",
+                _path_argument_for_executable(
+                    blender, ROOT / "tools/blender_cloth_simulation.py"
+                ),
+                "--",
+                "--job",
+                _path_argument_for_executable(
+                    blender, ROOT / "config/products" / product_id / "job.json"
+                ),
+                "--prototype",
+            ]
+            execution = subprocess.run(
+                command, cwd=ROOT, capture_output=True, text=True, check=False
             )
+            simulation_log.write_text(
+                execution.stdout + "\n" + execution.stderr, encoding="utf-8"
+            )
+            if execution.returncode:
+                raise RuntimeError(
+                    f"Native sewn cloth solve failed; see {relative(simulation_log)}: {execution.stderr[-2500:]}"
+                )
     payload = read_object(report, "cloth simulation report")
     candidate_paths = []
     if simulation_log is not None:

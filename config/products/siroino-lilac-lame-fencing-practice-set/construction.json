@@ -57,7 +57,7 @@
         "shorts-back-left",
         "shorts-back-right"
       ],
-      "reason": "Prototype update: preserve the four-panel shorts' shared internal seams during nearest-body placement, then fade placement back over 50 mm. The measured shared center-rise vertex moved 16 mm sideways toward a nearest body point 44.6 mm away, matching the directly reviewed center/inner-thigh wedge. The 50 mm preservation radius is a bounded geometry hypothesis; ease, continuous skin clearance, fit, cloth response, poses and runtime remain unapproved."
+      "reason": "Prototype update: preserve the four-panel shorts shared internal seams during nearest-body placement, then distribute centerline skinning across both measured thigh bones with a smooth side transition. The v3 shared center-rise vertex had moved 16 mm toward a nearest body point 44.6 mm away; the seam-preservation guard fixed that mesh movement, but direct crouch/sit renders still showed inner-thigh exposure. The v4 bilateral centerline weights are a bounded deformation hypothesis. Ease, continuous skin clearance, fit, cloth response, poses and runtime remain unapproved."
     }
   ],
   "separateGeometry": [
@@ -120,9 +120,9 @@
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-1b13171cf68aec33.json",
-        "evidenceSha256": "1b13171cf68aec33b42547f53b9a59f7a9e939780cd71361acfdf8881f1e5f08",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20, rebound from baseline bada626 (736adc2d84a00b03) after verifying component and stitched-seam invariance. Diagnostic geometry only; no fit, pose, or visual acceptance."
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-f3129274e01992fa.json",
+        "evidenceSha256": "f3129274e01992fa773941f0272b7609d0f9918049b8b6e2695ab5b65ea040ba",
+        "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
   },
@@ -178,7 +178,7 @@
           "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
         },
         {
-          "method": "hip-anchored-lateral-thigh-fade-v1",
+          "method": "hip-anchored-bilateral-center-fade-v2",
           "pieceIds": [
             "shorts-front-left",
             "shorts-front-right",
@@ -191,8 +191,9 @@
           "waistThighWeight": 0.15,
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
+          "centerlineThighWeightFraction": 0.7,
           "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "Prototype hip/thigh weighting applies to the four joined shorts body panels only. The former separate inner-thigh insert and its interior-only boost have been removed; weight response, coverage, pose deformation and fit remain unmeasured."
+          "evidenceBoundary": "Prototype weighting change after v3 renders: the shared centerline seam was hips-only while opposing thigh bones moved apart. Within the 20 mm centerline band, assign 70% of the local waist-to-hem thigh profile equally to both measured UpperLeg bones; transition the opposing share smoothly to the ipsilateral bone by 60 mm lateral distance. This is a body-specific deformation hypothesis, not fit, coverage, pose or runtime acceptance."
         }
       ]
     }

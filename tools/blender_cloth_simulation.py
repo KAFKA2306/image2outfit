@@ -105,6 +105,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--job", type=Path, required=True)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--prototype", action="store_true")
+    parser.add_argument("--remeasure-bending-component")
     parser.add_argument("--rebind-bending-component")
     parser.add_argument("--baseline-revision")
     parser.add_argument("--baseline-pattern-current-if-evidence-matches", action="store_true")
@@ -1294,20 +1295,40 @@ def rebind_component_bending(
     }
 
 
-def bake_sewn_prototype(job: dict[str, object]) -> int:
+def bake_sewn_prototype(
+    job: dict[str, object], *, remeasure_bending_component: str | None = None
+) -> int:
     """Run a bounded solve on attributed panels, preserving the input .blend."""
     _require_blender()
     blend = repo_path(str(job.get("manufacturingBlendPath", job["blendPath"])))
     source_hash = hashlib.sha256(blend.read_bytes()).hexdigest()
     construction_path = repo_path(job["garmentPipeline"]["constructionPath"])
     construction = read_json(construction_path)
+    input_construction_sha = hashlib.sha256(construction_path.read_bytes()).hexdigest()
     policy = construction["clothSimulation"]
     groups = policy["prototypePanelGroups"]
+    bending = policy.get("prototypeComponentBending", {})
     if set(groups) != set(policy["components"]):
         raise ValueError("prototype panel groups must cover the cloth policy")
     frame_end = policy["prototypeFrameEnd"]
     if not isinstance(frame_end, int) or not 2 <= frame_end <= 120:
         raise ValueError("bounded prototype frame range is required")
+    if remeasure_bending_component is not None:
+        if remeasure_bending_component not in bending or remeasure_bending_component not in groups:
+            raise ValueError(
+                f"cannot remeasure undeclared cloth bending component: {remeasure_bending_component}"
+            )
+        measurement_inputs = {
+            "assemblyPoseSha256": hashlib.sha256(
+                repo_path(job["garmentPipeline"]["assemblyPosePath"]).read_bytes()
+            ).hexdigest(),
+            "patternSha256": hashlib.sha256(
+                repo_path(job["garmentPipeline"]["patternContractPath"]).read_bytes()
+            ).hexdigest(),
+            "targetSourceSha256": hashlib.sha256(
+                repo_path(job["targetSourcePath"]).read_bytes()
+            ).hexdigest(),
+        }
     bpy.ops.wm.open_mainfile(filepath=str(blend), load_ui=False)
     original = bpy.data.objects.get(str(job["id"]))
     if original is None or original.type != "MESH":
@@ -1426,29 +1447,43 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         rest = policy.get("prototypeRestShape", {}).get(name)
         rest_contract = bind_canonical_row_rest_shape(obj, job, rest) if rest is not None else None
         contract = configure_cloth(obj, frame_end)
-        bending = policy.get("prototypeComponentBending", {})
         if not set(bending).issubset(groups):
             raise ValueError("Bending declaration references an unknown cloth component")
         if name in bending:
             declared = bending[name]
             modifier = obj.modifiers["Image2Outfit Cloth"]
             limits = modifier.settings.bl_rna.properties["bending_stiffness"]
-            value, _ = validate_component_bending_evidence(
-                job,
-                declared,
-                frame_end=frame_end,
-                blender_version=bpy.app.version_string,
-                bending_model=modifier.settings.bending_model,
-                stiffness_min=limits.hard_min,
-                stiffness_max=limits.hard_max,
-            )
+            if name == remeasure_bending_component:
+                value = declared.get("stiffness")
+                if (
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not math.isfinite(value)
+                    or not limits.hard_min <= value <= limits.hard_max
+                ):
+                    raise ValueError(
+                        f"declared bending stiffness is outside Blender limits for {name}"
+                    )
+            else:
+                value, _ = validate_component_bending_evidence(
+                    job,
+                    declared,
+                    frame_end=frame_end,
+                    blender_version=bpy.app.version_string,
+                    bending_model=modifier.settings.bending_model,
+                    stiffness_min=limits.hard_min,
+                    stiffness_max=limits.hard_max,
+                )
             modifier.settings.bending_stiffness = value
             contract["componentBending"] = {
                 "stiffness": modifier.settings.bending_stiffness,
                 "maximum": modifier.settings.bending_stiffness_max,
                 "model": modifier.settings.bending_model,
-                "evidencePath": declared["evidencePath"], "evidenceSha256": declared["evidenceSha256"],
-                "evidenceBoundary": declared["evidenceBoundary"], "grantsFitAcceptance": False}
+                "evidencePath": declared.get("evidencePath"),
+                "evidenceSha256": declared.get("evidenceSha256"),
+                "evidenceBoundary": declared.get("evidenceBoundary"),
+                "remeasurementPending": name == remeasure_bending_component,
+                "grantsFitAcceptance": False}
         if rest is not None:
             key = obj.data.shape_keys.key_blocks[rest_contract["shapeKey"]]
             modifier = obj.modifiers["Image2Outfit Cloth"]
@@ -1547,9 +1582,80 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                         geometryChanged=settled != before[obj.name])
     runtime = ROOT / ".image2outfit" / "products" / str(job["id"]) / "cloth"
     runtime.mkdir(parents=True, exist_ok=True)
-    candidate = runtime / "settled-prototype.blend"
+    candidate_name = (
+        f"settled-prototype-{remeasure_bending_component}-{source_hash[:12]}.blend"
+        if remeasure_bending_component is not None
+        else "settled-prototype.blend"
+    )
+    candidate = runtime / candidate_name
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(candidate), check_existing=False)
+    remeasurement = None
+    if remeasure_bending_component is not None:
+        contract = next(
+            item for item in contracts if item["object"] == remeasure_bending_component
+        )
+        declared = bending[remeasure_bending_component]
+        evidence = {
+            "schemaVersion": 1,
+            "productId": job["id"],
+            "blenderVersion": bpy.app.version_string,
+            "sourceBlendSha256": source_hash,
+            "constructionSha256": input_construction_sha,
+            **measurement_inputs,
+            "clothImplementationSha256": hashlib.sha256(
+                (ROOT / "tools" / "blender_cloth_simulation.py").read_bytes()
+            ).hexdigest(),
+            "sourceSkirtMeshSha256": contract["preBakeMeshSha256"],
+            "bendingStiffness": float(declared["stiffness"]),
+            "bendingStiffnessMax": float(contract["componentBending"]["maximum"]),
+            "bendingModel": contract["componentBending"]["model"],
+            "frameEnd": frame_end,
+            "cacheBaked": contract["cacheBakedActual"],
+            "settledMeshSha256": contract["settledMeshSha256"],
+            "grantsFitAcceptance": False,
+            "grantsVisualAcceptance": False,
+            "measurementMethod": "native-blender-cloth-component-remeasurement",
+            "component": remeasure_bending_component,
+            "evidenceBoundary": (
+                "Direct bounded native Blender Cloth solve on the current sewn prototype; "
+                "component bending stiffness and exact source/pose/pattern/body hashes recorded. "
+                "Diagnostic geometry only; no fit, pose, or visual acceptance."
+            ),
+        }
+        evidence_bytes = (
+            json.dumps(evidence, ensure_ascii=False, indent=2) + "\n"
+        ).encode("utf-8")
+        evidence_sha = sha256_bytes(evidence_bytes)
+        evidence_path = _content_addressed_evidence_path(
+            ROOT,
+            str(job["id"]),
+            remeasure_bending_component,
+            Path(str(declared["evidencePath"])),
+            evidence_sha,
+        )
+        atomic_write_bytes(evidence_path, evidence_bytes)
+        if sha256_bytes(evidence_path.read_bytes()) != evidence_sha:
+            raise RuntimeError("Written remeasured bending evidence hash mismatch")
+        evidence_rel = str(evidence_path.relative_to(ROOT)).replace("\\", "/")
+        updated = json.loads(json.dumps(construction))
+        updated_declared = updated["clothSimulation"]["prototypeComponentBending"][
+            remeasure_bending_component
+        ]
+        updated_declared["evidencePath"] = evidence_rel
+        updated_declared["evidenceSha256"] = evidence_sha
+        updated_declared["evidenceBoundary"] = evidence["evidenceBoundary"]
+        atomic_write_bytes(
+            construction_path,
+            (json.dumps(updated, ensure_ascii=False, indent=2) + "\n").encode("utf-8"),
+        )
+        remeasurement = {
+            "component": remeasure_bending_component,
+            "evidencePath": evidence_rel,
+            "evidenceSha256": evidence_sha,
+            "measurementConstructionSha256": input_construction_sha,
+            "evidenceBoundary": evidence["evidenceBoundary"],
+        }
     report = {
         "schemaVersion": 1, "productId": job["id"], "status": "PASS",
         "engine": "Blender Cloth", "blenderVersion": bpy.app.version_string,
@@ -1557,10 +1663,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         "cacheBaked": True, "geometryChanged": all(c["geometryChanged"] for c in contracts),
         "contracts": contracts, "sourceBlendSha256": source_hash,
         "constructionSha256": hashlib.sha256(construction_path.read_bytes()).hexdigest(),
+        "measurementConstructionSha256": input_construction_sha,
         "candidatePath": str(candidate.relative_to(ROOT)).replace("\\", "/"),
         "candidateSha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
         "collisionObjects": [body.name for body in bodies],
         "qualityDecision": "UNVERIFIED", "grantsFitAcceptance": False,
+        "bendingRemeasurement": remeasurement,
         "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance.",
     }
     write_json(repo_path(str(job["productRoot"])) / "Evidence/Build/cloth-simulation.json", report)
@@ -1570,6 +1678,14 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
 def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
     options = parse_args(argv)
     job = read_json(repo_path(options.job, root=root))
+    if options.remeasure_bending_component is not None and not options.prototype:
+        raise ValueError("--remeasure-bending-component requires --prototype")
+    if options.remeasure_bending_component is not None and (
+        options.rebind_bending_component is not None or options.force
+    ):
+        raise ValueError(
+            "--remeasure-bending-component cannot be combined with rebind or --force"
+        )
     if options.baseline_pattern_current_if_evidence_matches and (
         options.rebind_bending_component is None
         or options.baseline_revision is None
@@ -1608,7 +1724,9 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
     _require_blender()
     product_id = str(job.get("id", ""))
     if options.prototype:
-        return bake_sewn_prototype(job)
+        return bake_sewn_prototype(
+            job, remeasure_bending_component=options.remeasure_bending_component
+        )
     if product_id not in COMPONENTS:
         raise ValueError(f"no cloth component contract for {product_id}")
     report_path = (

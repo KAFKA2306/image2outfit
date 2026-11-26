@@ -59,9 +59,10 @@
         "stiffness": 20.0,
         "maximum": 20.0,
         "model": "ANGULAR",
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-1b13171cf68aec33.json",
-        "evidenceSha256": "1b13171cf68aec33b42547f53b9a59f7a9e939780cd71361acfdf8881f1e5f08",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated pleated-overskirt bending comparison at stiffness 20, rebound from baseline bada626 (736adc2d84a00b03) after verifying component and stitched-seam invariance. Diagnostic geometry only; no fit, pose, or visual acceptance.",
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-f3129274e01992fa.json",
+        "evidenceSha256": "f3129274e01992fa773941f0272b7609d0f9918049b8b6e2695ab5b65ea040ba",
+        "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance.",
+        "remeasurementPending": false,
         "grantsFitAcceptance": false
       },
       "pinMethod": "canonical shared seam vertices",
@@ -98,14 +99,16 @@
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "b43182ff6af77eaf88017ceb687b2eb78d395ad34b19cd4cfe7876afb222dbc8",
-  "constructionSha256": "27a06923bc8693d7efeab83f1017aca5f3b904aed6fb7ba3dc705ee1f4830ada",
+  "sourceBlendSha256": "0b61ceecdb87c1867da7bfa668b0b0d634dfcf83204bf357fadb967ea87bc30d",
+  "constructionSha256": "c771a84d90ec3231933300dfd86664a984b5cfb4297d16e71d234c405ca6adcb",
+  "measurementConstructionSha256": "c771a84d90ec3231933300dfd86664a984b5cfb4297d16e71d234c405ca6adcb",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "549a1678ecb1c403b018db420b3d3c4d4310e3a502ddda8ec80c9f5a6b5e28d4",
+  "candidateSha256": "287f3df61be2b34e3191250c3f29beedffa16cd01d3372b6f35934dfd65664ce",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
   "qualityDecision": "UNVERIFIED",
   "grantsFitAcceptance": false,
+  "bendingRemeasurement": null,
   "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance."
 }
