@@ -254,8 +254,15 @@ def _resume_or_reset(
 ) -> dict[str, Any]:
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
+    allowed_drift = {"sourceFingerprint"}
+    if allow_verified_prefix_on_source_change and "sourceFingerprint" in mismatches:
+        # A new product revision necessarily has different hypothesis-bound
+        # artifact refs. Allow the explicit resume path to verify reusable
+        # outputs; the artifact-DAG checks below will reject refs bound to the
+        # previous revision and start the new run at its first affected stage.
+        allowed_drift.add("revisionId")
     non_source_mismatches = [
-        value for value in mismatches if value != "sourceFingerprint"
+        value for value in mismatches if value not in allowed_drift
     ]
     if non_source_mismatches:
         _assert_identity(previous, expected)
@@ -359,8 +366,10 @@ def _resume_or_reset(
 
     state = _new_state(request, expected, mode)
     state["checkpoint_reset"] = {
-        "reason": "source-fingerprint-changed",
+        "reason": "source-or-revision-changed",
         "previousRunId": str(previous.get("run_id", "")),
+        "previousRevisionId": str(previous.get("revision_id", "")),
+        "revisionId": expected["revisionId"],
         "previousSourceFingerprint": str(previous.get("source_fingerprint", "")),
         "sourceFingerprint": expected["sourceFingerprint"],
     }

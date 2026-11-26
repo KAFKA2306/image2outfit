@@ -451,7 +451,10 @@ def preserved_seam_factors(mesh, spec):
     from mathutils import Vector
     import math
     preserve = set(spec.get("preserveSharedPieceIds", []))
-    if not preserve:
+    preserve_internal = spec.get("preserveInternalSelectedSeams", False)
+    if not isinstance(preserve_internal, bool):
+        raise ValueError("preserveInternalSelectedSeams must be boolean")
+    if not preserve and not preserve_internal:
         return {}
     owners = defaultdict(set)
     for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
@@ -459,9 +462,17 @@ def preserved_seam_factors(mesh, spec):
             owners[i].add(piece)
     if not preserve.issubset(set(mesh["facePieceIds"])):
         raise ValueError("Preserved seam pieces missing")
-    shared = [i for i, pieces in owners.items() if pieces.intersection(preserve) and pieces.intersection(spec["pieceIds"])]
+    selected = set(spec["pieceIds"])
+    shared = [i for i, pieces in owners.items()
+              if pieces.intersection(preserve) and pieces.intersection(selected)]
+    if preserve_internal:
+        shared.extend(i for i, pieces in owners.items()
+                      if len(pieces.intersection(selected)) > 1)
+    shared = sorted(set(shared))
     fade = spec.get("preservedSeamFadeDistanceM")
     if fade is None:
+        if preserve_internal:
+            raise ValueError("preservedSeamFadeDistanceM is required for internal selected seams")
         return {i: 0.0 for i in shared}
     if not shared or not math.isfinite(fade) or fade <= 0:
         raise ValueError("Invalid preserved seam fade configuration")

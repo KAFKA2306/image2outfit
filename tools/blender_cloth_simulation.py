@@ -107,6 +107,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--prototype", action="store_true")
     parser.add_argument("--rebind-bending-component")
     parser.add_argument("--baseline-revision")
+    parser.add_argument("--baseline-pattern-current-if-evidence-matches", action="store_true")
     return parser.parse_args(values)
 
 
@@ -893,6 +894,7 @@ def verify_component_bending_rebind_preconditions(
     component: str,
     baseline_revision: str,
     *,
+    baseline_pattern_current_if_evidence_matches: bool = False,
     root: Path | None = None,
 ) -> dict[str, Any]:
     base_root = (root or ROOT).resolve()
@@ -1025,10 +1027,22 @@ def verify_component_bending_rebind_preconditions(
         raise ValueError(
             "Baseline revision does not match existing bending comparison evidence: assemblyPoseSha256"
         )
+    baseline_pattern_source = "baseline-revision"
     if old_evidence.get("patternSha256") != baseline_pattern_sha:
-        raise ValueError(
-            "Baseline revision does not match existing bending comparison evidence: patternSha256"
-        )
+        if (
+            baseline_pattern_current_if_evidence_matches
+            and sha256_bytes(current_pattern_bytes) == old_evidence.get("patternSha256")
+        ):
+            # The prior measurement is itself hash-bound to this exact generated
+            # pattern input. Use those bytes as the invariant baseline instead of
+            # inventing a different committed pattern revision.
+            baseline_pattern_bytes = current_pattern_bytes
+            baseline_pattern_sha = sha256_bytes(baseline_pattern_bytes)
+            baseline_pattern_source = "current-pattern-matching-prior-evidence-sha256"
+        else:
+            raise ValueError(
+                "Baseline revision does not match existing bending comparison evidence: patternSha256"
+            )
     if old_evidence.get("targetSourceSha256") != current_target_sha:
         raise ValueError(
             "Target source changed; bending comparison must be remeasured"
@@ -1121,6 +1135,7 @@ def verify_component_bending_rebind_preconditions(
         "oldEvidence": old_evidence,
         "baselineAssemblyPoseSha256": baseline_pose_sha,
         "baselinePatternSha256": baseline_pattern_sha,
+        "baselinePatternSource": baseline_pattern_source,
         "currentAssemblyPoseSha256": current_pose_sha,
         "currentPatternSha256": current_pattern_sha,
         "currentTargetSha256": current_target_sha,
@@ -1158,10 +1173,15 @@ def rebind_component_bending(
     component: str,
     baseline_revision: str,
     *,
+    baseline_pattern_current_if_evidence_matches: bool = False,
     root: Path | None = None,
 ) -> dict[str, Any]:
     checked = verify_component_bending_rebind_preconditions(
-        job, component, baseline_revision, root=root
+        job,
+        component,
+        baseline_revision,
+        baseline_pattern_current_if_evidence_matches=baseline_pattern_current_if_evidence_matches,
+        root=root,
     )
     if (
         checked["currentAssemblyPoseSha256"] == checked["baselineAssemblyPoseSha256"]
@@ -1203,6 +1223,7 @@ def rebind_component_bending(
         "baselineEvidenceSha256": checked["oldEvidenceSha256"],
         "baselineAssemblyPoseSha256": checked["baselineAssemblyPoseSha256"],
         "baselinePatternSha256": checked["baselinePatternSha256"],
+        "baselinePatternSource": checked["baselinePatternSource"],
         "unchangedTargetSourceSha256": checked["currentTargetSha256"],
         "changedNonComponentPatternPieces": checked["changedPatternPieces"],
         "changedNonComponentPosePieces": checked["changedPosePieces"],
@@ -1549,6 +1570,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
 def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
     options = parse_args(argv)
     job = read_json(repo_path(options.job, root=root))
+    if options.baseline_pattern_current_if_evidence_matches and (
+        options.rebind_bending_component is None
+        or options.baseline_revision is None
+    ):
+        raise ValueError(
+            "--baseline-pattern-current-if-evidence-matches requires a bending rebind"
+        )
     if (
         options.rebind_bending_component is not None
         or options.baseline_revision is not None
@@ -1570,6 +1598,9 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
             job,
             options.rebind_bending_component,
             options.baseline_revision,
+            baseline_pattern_current_if_evidence_matches=(
+                options.baseline_pattern_current_if_evidence_matches
+            ),
             root=root,
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
