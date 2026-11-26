@@ -46,7 +46,7 @@
         "waistband-front",
         "waistband-back"
       ],
-      "reason": "Directly observed as a short pleated layer over fitted shorts; pleat count, panelization, and attachment remain hypotheses."
+      "reason": "V9 trial shortens the overskirt panel depth to 95 mm and the flat half-width to 235 mm, retaining the waist edge. It aims to expose the fitted under-shorts and reduce pointed rear fold tails; pleat count, panelization, attachment, and fit remain unverified hypotheses."
     },
     {
       "componentId": "fitted-under-shorts",
@@ -57,7 +57,7 @@
         "shorts-back-left",
         "shorts-back-right"
       ],
-      "reason": "Prototype update: preserve the four-panel shorts shared internal seams during nearest-body placement, then distribute centerline skinning across both measured thigh bones with a smooth side transition. The v3 shared center-rise vertex had moved 16 mm toward a nearest body point 44.6 mm away; the seam-preservation guard fixed that mesh movement, but direct crouch/sit renders still showed inner-thigh exposure. The v4 bilateral centerline weights are a bounded deformation hypothesis. Ease, continuous skin clearance, fit, cloth response, poses and runtime remain unapproved."
+      "reason": "v8 prototype: raise the outer leg hem to local pattern Y -0.055..-0.030 m but place the inner endpoint at Y -0.160 m below the center-rise terminus at -0.140 m, retaining the deeper center-front/back rise. Altered sewn endpoints align to declared wrap bounds. Keep existing panel/stitch IDs; dimensions, coverage, ease, pose and runtime remain unverified hypotheses."
     }
   ],
   "separateGeometry": [
@@ -120,8 +120,8 @@
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-f3129274e01992fa.json",
-        "evidenceSha256": "f3129274e01992fa773941f0272b7609d0f9918049b8b6e2695ab5b65ea040ba",
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-5c410220445b258f.json",
+        "evidenceSha256": "5c410220445b258f8f13a45f5b6c463cb13ef5f85d947f29a8bff7a0997c374d",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
@@ -190,10 +190,10 @@
           "rightThighBone": "UpperLeg_R",
           "waistThighWeight": 0.15,
           "hemThighWeight": 0.65,
-          "centerlineHalfWidthM": 0.02,
-          "centerlineThighWeightFraction": 0.7,
-          "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "Prototype weighting change after v3 renders: the shared centerline seam was hips-only while opposing thigh bones moved apart. Within the 20 mm centerline band, assign 70% of the local waist-to-hem thigh profile equally to both measured UpperLeg bones; transition the opposing share smoothly to the ipsilateral bone by 60 mm lateral distance. This is a body-specific deformation hypothesis, not fit, coverage, pose or runtime acceptance."
+          "centerlineHalfWidthM": 0.025,
+          "centerlineThighWeightFraction": 0.0,
+          "fullSideWeightWidthM": 0.09,
+          "evidenceBoundary": "v6 prototype hypothesis: assign zero thigh influence inside the 25 mm centerline band so the integrated crotch rise follows Hips; smoothly fade the ipsilateral thigh influence from that band to the local height profile by 90 mm lateral distance. This deformation trial remains separate from the seam-bound pattern correction; no fit, coverage, pose, penetration, or runtime acceptance."
         }
       ]
     }

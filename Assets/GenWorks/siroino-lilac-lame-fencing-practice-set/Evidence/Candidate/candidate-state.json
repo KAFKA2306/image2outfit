@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v4-shorts-bilateral-crotch-weights-20261126",
+  "revision": "v9-shorter-narrower-overskirt-20261127",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all current views and poses: in crouch and sit, shorts do not maintain continuous upper-thigh and center coverage; exposed thigh and the inner center gap remain visible. In neutral and standing views the shorts still descend to around the knee with an overly tubular silhouette. Bilateral centerline weights did not visually resolve the coverage defect. Fit and continuous clearance remain unverified.",
       "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
-      "severity": "BLOCKER"
+      "severity": "blocker",
+      "description": "Direct inspection of front, arm-cross, crouch and sit renders: the shorts hem is visible in neutral but both gray thighs break through the white shorts coverage up to the hips in crouch and sit. A narrow white strip remains between the thighs in neutral. The intended under-short layer does not retain hip-flexion coverage."
     },
     {
-      "description": "Direct inspection of pose renders: the overskirt rear panels fold inward into bulky angular flaps in crouch and sit and collapse across the back/legs in prone. Standing flare remains uneven. Pleat order and motion remain visually rejected.",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "severity": "BLOCKER"
+      "severity": "blocker",
+      "description": "Direct inspection of back, three-quarter, crouch, sit and prone renders: the rear overskirt still forms two long, sharply pointed strips beneath the seat in crouch and sit. The panels collapse into angular tails instead of controlled pleats; the shorter/narrower V9 trial did not resolve this defect."
     },
     {
-      "description": "Directly inspected front and three-quarter views: diagonal placket and button-like details are visible, but the images do not establish fastening or retention during movement. Closure security and measured waist fit remain unapproved.",
+      "code": "JACKET_SURFACE_QUALITY",
+      "severity": "major",
+      "description": "Direct inspection of front, side, neutral, arms-up and arm-cross renders: broad faceted wrinkles and pinched folds persist around sleeves, underarms and jacket waist. The surface does not read as a finished smooth fencing jacket."
+    },
+    {
       "code": "FRONT_CLOSURE_UNFASTENED",
-      "severity": "BLOCKER"
-    },
-    {
-      "description": "Direct inspection of neutral, arms-up and arm-cross poses: sleeves and underarm show faceted folds; the collar ends as an open, cut-off neck rim on this headless pose model. Surface quality, head clearance and strain remain unverified.",
-      "code": "COLLAR_SLEEVE_SURFACE_QUALITY",
-      "severity": "BLOCKER"
+      "severity": "blocker",
+      "description": "The diagonal lilac placket and button-like details are visible, but the prototype construction declares the closure unfastened and no retained fastening is demonstrated. Do not infer closure security or fit from the render."
     }
   ],
   "failedGeometryChecks": [
