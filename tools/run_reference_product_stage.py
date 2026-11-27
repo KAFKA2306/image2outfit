@@ -1517,6 +1517,9 @@ def stage_initialize(
     review_path, review, review_evidence_paths = validate_prototype_readiness(
         job, request, job_path
     )
+    construction_path = repo_path(
+        job["garmentPipeline"]["constructionPath"], label="construction"
+    )
     gates = manifest.get("technicalGates", {})
     if not isinstance(gates, Mapping):
         raise ValueError("product manifest technicalGates must be an object")
@@ -1578,7 +1581,14 @@ def stage_initialize(
         result,
         stage="initialize-3d",
         product_id=product_id,
-        paths=[manifest_path, *review_evidence_paths, report],
+        paths=[
+            report,
+            *(
+                path
+                for path in review_evidence_paths
+                if path != construction_path
+            ),
+        ],
         extra={
             "visualAppearanceReview": gates.get("visualAppearanceReview", "PENDING"),
             "prototypeReadiness": {
@@ -1918,6 +1928,8 @@ def stage_build(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
+    private_report = runtime_root(product_id) / "build/private-build-report.json"
+    private_report.parent.mkdir(parents=True, exist_ok=True)
     build_invocation_id = uuid.uuid4().hex
     blender = blender_executable()
     command = [
@@ -1935,6 +1947,7 @@ def stage_build(
     ]
     build_env = dict(os.environ)
     build_env["IMAGE2OUTFIT_BUILD_INVOCATION_ID"] = build_invocation_id
+    build_env["IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH"] = str(private_report)
     if job["garmentPipeline"].get("meshSource") == "garmentcode-boxmesh":
         if boxmesh_evidence is None:
             raise ValueError("Sewn prototype requires a validated BoxMesh exchange")
@@ -1945,6 +1958,7 @@ def stage_build(
                 build_env,
                 {
                     "IMAGE2OUTFIT_SEWN_MESH_PATH": "w",
+                    "IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH": "w",
                     "IMAGE2OUTFIT_BUILD_INVOCATION_ID": "",
                 },
             )
@@ -1963,8 +1977,8 @@ def stage_build(
 
     quality: dict[str, Any] | None = None
     report_payload: dict[str, Any] | None = None
-    if report.is_file():
-        report_payload = read_object(report, "build report")
+    if private_report.is_file():
+        report_payload = read_object(private_report, "private build report")
         quality = geometry_quality(report_payload)
     report_fresh = bool(
         report_payload is not None
@@ -2004,7 +2018,48 @@ def stage_build(
             f"see {relative(log)}"
         )
     if quality is None:
-        raise FileNotFoundError(f"build report was not created: {relative(report)}")
+        raise FileNotFoundError(
+            f"private build report was not created: {relative(private_report)}"
+        )
+
+    metrics = report_payload.get("metrics", {})
+    gate = report_payload.get("geometryGate", {})
+    prototype_surface = report_payload.get("prototypeSurfaceMotifs", {})
+    plastron = prototype_surface.get("plastron", {}) if isinstance(prototype_surface, Mapping) else {}
+    safe_report = {
+        "schemaVersion": report_payload.get("schemaVersion", 1),
+        "productId": product_id,
+        "passed": report_payload.get("passed") is True,
+        "buildInvocationId": build_invocation_id,
+        "buildDisposition": report_payload.get("buildDisposition"),
+        "sourceBlendSha256": report_payload.get("sourceBlendSha256"),
+        "sewnMeshSha256": report_payload.get("sewnMeshSha256"),
+        "canonicalInputs": report_payload.get("canonicalInputs", {}),
+        "metrics": {
+            key: metrics[key]
+            for key in ("vertices", "triangles", "unweightedVertices", "degenerateTriangles")
+            if key in metrics
+        },
+        "geometryGate": {
+            "checks": {
+                str(key): value
+                for key, value in gate.get("checks", {}).items()
+                if isinstance(value, bool)
+            }
+        },
+        "prototypeSurfaceMotifs": {
+            "plastron": {
+                "uvStatus": plastron.get("uvStatus"),
+                "designUvStatus": plastron.get("designUvStatus"),
+            }
+        },
+        "evidenceBoundary": "Aggregate garment build evidence only. Detailed avatar-derived contour and surface coordinates remain local.",
+        "evidencePersistence": {
+            "sourceReportSha256": sha256(private_report),
+            "scope": "Public quality summary; detailed avatar measurements and per-stage coordinates remain local.",
+        },
+    }
+    write_json(report, safe_report)
 
     emit(
         result,
@@ -2013,6 +2068,7 @@ def stage_build(
         paths=[
             blend,
             report,
+            private_report,
             log,
             runtime_root(product_id) / "initialization" / "prototype-readiness.json",
             *([*boxmesh_evidence] if boxmesh_evidence is not None else []),
@@ -2058,9 +2114,15 @@ def stage_build(
 
 def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
-    report = repo_path(
+    public_report = repo_path(
         f"{job['productRoot']}/Evidence/Build/cloth-simulation.json",
         label="cloth report",
+    )
+    is_boxmesh = job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh"
+    report = (
+        runtime_root(product_id) / "cloth/cloth-simulation-report.json"
+        if is_boxmesh
+        else public_report
     )
     simulation_log = None
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
@@ -2177,8 +2239,16 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 command.extend(
                     ("--remeasure-bending-component", remeasure_component)
                 )
+            simulation_env = dict(os.environ)
+            private_build_report = runtime_root(product_id) / "build/private-build-report.json"
+            simulation_env["IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH"] = str(private_build_report)
+            if Path(blender).suffix.lower() == ".exe":
+                _add_wsl_interop_variables(
+                    simulation_env,
+                    {"IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH": "w"},
+                )
             execution = subprocess.run(
-                command, cwd=ROOT, capture_output=True, text=True, check=False
+                command, cwd=ROOT, env=simulation_env, capture_output=True, text=True, check=False
             )
             simulation_log.write_text(
                 execution.stdout + "\n" + execution.stderr, encoding="utf-8"
@@ -2190,6 +2260,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     payload = read_object(report, "cloth simulation report")
     candidate_paths = []
     measurement = payload.get("bendingRemeasurement")
+    bending_evidence: Mapping[str, Any] | None = None
     if measurement is not None:
         if not isinstance(measurement, Mapping):
             raise ValueError("cloth bending remeasurement record must be an object")
@@ -2199,6 +2270,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         )
         if sha256(evidence_path) != measurement.get("evidenceSha256"):
             raise ValueError("cloth bending remeasurement evidence hash mismatch")
+        bending_evidence = read_object(evidence_path, "bending remeasurement evidence")
         candidate_paths.append(evidence_path)
     if simulation_log is not None:
         if payload.get("sourceBlendSha256") != sha256(
@@ -2308,11 +2380,132 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     elif contracts:
         raise ValueError("NOT_REQUIRED cloth policy must not report simulated objects")
 
+    public_measurement_paths: list[Path] = []
+    if (
+        is_boxmesh
+        and isinstance(measurement, Mapping)
+        and bending_evidence is not None
+    ):
+        evidence = bending_evidence
+        public_measurement_path = repo_path(
+            f"{job['productRoot']}/Evidence/Build/cloth-bending-remeasurement.json",
+            label="public cloth measurement summary",
+        )
+        public_measurement = {
+            "schemaVersion": 1,
+            "productId": evidence["productId"],
+            "blenderVersion": evidence["blenderVersion"],
+            "assemblyPoseSha256": evidence["assemblyPoseSha256"],
+            "patternSha256": evidence["patternSha256"],
+            "targetSourceSha256": evidence["targetSourceSha256"],
+            "bendingStiffness": evidence["bendingStiffness"],
+            "bendingModel": evidence["bendingModel"],
+            "frameEnd": evidence["frameEnd"],
+            "cacheBaked": evidence["cacheBaked"],
+            "grantsFitAcceptance": False,
+            "grantsVisualAcceptance": False,
+            "evidenceBoundary": evidence["evidenceBoundary"],
+            "evidencePersistence": {
+                "scope": "Bounded cloth measurement summary; local source geometry and body measurements are not published."
+            },
+        }
+        write_json(public_measurement_path, public_measurement)
+        public_measurement_sha = sha256(public_measurement_path)
+        updated_construction = read_object(construction_path, "construction")
+        declared_bending = updated_construction["clothSimulation"][
+            "prototypeComponentBending"
+        ][measurement["component"]]
+        declared_bending["evidencePath"] = relative(public_measurement_path)
+        declared_bending["evidenceSha256"] = public_measurement_sha
+        declared_bending["evidenceBoundary"] = evidence["evidenceBoundary"]
+        write_json(construction_path, updated_construction)
+        payload["constructionSha256"] = sha256(construction_path)
+        payload["bendingRemeasurement"] = {
+            "component": measurement["component"],
+            "evidencePath": relative(public_measurement_path),
+            "evidenceSha256": public_measurement_sha,
+            "measurementConstructionSha256": measurement[
+                "measurementConstructionSha256"
+            ],
+            "evidenceBoundary": evidence["evidenceBoundary"],
+        }
+        write_json(report, payload)
+        public_measurement_paths.append(public_measurement_path)
+
+    if is_boxmesh:
+        public_payload = {
+            "schemaVersion": 1,
+            "productId": product_id,
+            "status": payload["status"],
+            "engine": payload["engine"],
+            "blenderVersion": payload["blenderVersion"],
+            "applicability": payload["applicability"],
+            "frameStart": payload["frameStart"],
+            "frameEnd": payload["frameEnd"],
+            "cacheBaked": payload["cacheBaked"],
+            "geometryChanged": payload["geometryChanged"],
+            "contracts": [
+                {
+                    key: contract[key]
+                    for key in (
+                        "object",
+                        "modifier",
+                        "pinVertexCount",
+                        "frameStart",
+                        "frameEnd",
+                        "pinMethod",
+                        "cacheBakedActual",
+                        "preBakeMeshSha256",
+                        "evaluatedFrameMeshSha256",
+                        "settledMeshSha256",
+                        "geometryChanged",
+                    )
+                    if key in contract
+                }
+                for contract in contracts
+            ],
+            "sourceBlendSha256": payload["sourceBlendSha256"],
+            "constructionSha256": payload["constructionSha256"],
+            "measurementConstructionSha256": payload.get(
+                "measurementConstructionSha256"
+            ),
+            "candidateSha256": payload["candidateSha256"],
+            "qualityDecision": "UNVERIFIED",
+            "grantsFitAcceptance": False,
+            "bendingRemeasurement": (
+                {
+                    key: measurement[key]
+                    for key in (
+                        "component",
+                        "evidenceSha256",
+                        "measurementConstructionSha256",
+                        "evidenceBoundary",
+                    )
+                    if key in measurement
+                }
+                if isinstance(measurement, Mapping)
+                else None
+            ),
+            "evidenceBoundary": payload["evidenceBoundary"],
+            "evidencePersistence": {
+                "rawEvidenceSha256": sha256(report),
+                "scope": "Public simulation summary; source paths, body measurements, and detailed geometry remain local.",
+            },
+        }
+        write_json(public_report, public_payload)
+
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[construction_path, report, blend, *candidate_paths],
+        paths=[
+            construction_path,
+            report,
+            public_report,
+            blend,
+            *public_measurement_paths,
+            *candidate_paths,
+        ],
         extra={
             "cacheEvidenceValidated": True,
             "simulationApplicability": applicability,
@@ -2363,6 +2556,25 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
             or sha256(fbx) != report["fbxSha256"]
         ):
             raise ValueError("skin/export artifact binding mismatch")
+        persistent_report = repo_path(
+            f"{job['productRoot']}/Evidence/Build/skin-export-report.json",
+            label="persistent skin export evidence",
+        )
+        persisted_report = {
+            "schemaVersion": 1,
+            "productId": product_id,
+            "executionStatus": report["executionStatus"],
+            "qualityDecision": "UNVERIFIED",
+            "method": report["method"],
+            "blenderVersion": report["blenderVersion"],
+            "fbxSha256": report["fbxSha256"],
+            "bodyGeometryExported": False,
+            "evidencePersistence": {
+                "sourceReportSha256": sha256(report_path),
+                "scope": "Export summary only; per-vertex weights and private source measurements remain local.",
+            },
+        }
+        write_json(persistent_report, persisted_report)
         garment_source_report = runtime_root(product_id) / "workline/garment-only-editable-report.json"
         garment_source_report.parent.mkdir(parents=True, exist_ok=True)
         sanitize_command = [
@@ -2421,7 +2633,15 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
             result,
             stage="skin-and-export",
             product_id=product_id,
-            paths=[source, garment_source, fbx, report_path, garment_source_report, log],
+            paths=[
+                source,
+                garment_source,
+                fbx,
+                report_path,
+                persistent_report,
+                garment_source_report,
+                log,
+            ],
             extra={
                 "editableSource": True,
                 "garmentOnlySource": True,
@@ -2507,24 +2727,30 @@ def _candidate_geometry_quality(
     garment.  For this pipeline, use the hash-bound skin export report for weight
     facts while retaining the prototype report's topology and fit gates.
     """
-    build_report_path = repo_path(
+    public_build_report_path = repo_path(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
-        label="build report",
+        label="public build report",
+    )
+    is_boxmesh = job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh"
+    build_report_path = (
+        runtime_root(str(job["id"])) / "build/private-build-report.json"
+        if is_boxmesh
+        else public_build_report_path
     )
     report = read_object(build_report_path, "build report")
-    evidence_paths = [build_report_path]
-    if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
+    evidence_paths = [public_build_report_path, build_report_path] if is_boxmesh else [build_report_path]
+    if is_boxmesh:
         product_id = str(job["id"])
+        public_skin_path = repo_path(
+            f"{job['productRoot']}/Evidence/Build/skin-export-report.json",
+            label="public skin export summary",
+        )
         skin_path = runtime_root(product_id) / "skin/skin-export-report.json"
         skin = read_object(skin_path, "skin export report")
-        weighted_blend = repo_path(
-            skin["weightedBlendPath"], label="weighted prototype"
-        )
         fbx = repo_path(job["fbxAssetPath"], label="FBX")
         if (
             skin.get("productId") != product_id
             or skin.get("executionStatus") != "PASS"
-            or sha256(weighted_blend) != skin.get("weightedBlendSha256")
             or sha256(fbx) != skin.get("fbxSha256")
         ):
             raise ValueError(
@@ -2550,7 +2776,7 @@ def _candidate_geometry_quality(
         geometry_gate["checks"] = checks
         combined["geometryGate"] = geometry_gate
         report = combined
-        evidence_paths.append(skin_path)
+        evidence_paths.extend((public_skin_path, skin_path))
     return geometry_quality(report), evidence_paths
 
 

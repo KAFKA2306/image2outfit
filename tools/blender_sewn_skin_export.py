@@ -115,7 +115,15 @@ def main():
     parser.add_argument("--job", required=True)
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
     job = read_json(repo_path(args.job))
-    cloth = read_json(repo_path(job["productRoot"] + "/Evidence/Build/cloth-simulation.json"))
+    cloth_report = (
+        ROOT
+        / ".image2outfit"
+        / "products"
+        / str(job["id"])
+        / "cloth"
+        / "cloth-simulation-report.json"
+    )
+    cloth = read_json(cloth_report)
     candidate = repo_path(cloth["candidatePath"])
     if digest(candidate) != cloth["candidateSha256"]:
         raise ValueError("cloth candidate is stale")

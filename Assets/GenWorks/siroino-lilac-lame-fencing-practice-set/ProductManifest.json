@@ -43,10 +43,10 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": "canonical-workflow-checkpoint",
-    "nextAction": "Keep V11 rejected and release blocked. Retained clasp bridge is now visible on the overlapping front panels; functional opening/retention is unverified. Next change must structurally improve shorts hip-flexion coverage, replace rear overskirt tails with stable supported construction, and smooth the jacket surface. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
+    "nextAction": "Keep V12 rejected and release blocked. Next revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, and smooth jacket panels. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T06:21:33Z",
+      "checkedAt": "2026-11-27T11:09:59Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -94,14 +94,14 @@
       "failedAttemptEvidenceAvailable": false,
       "blockedStage": null,
       "failureCode": null,
-      "nextAction": "Keep V11 rejected and release blocked. Retained clasp bridge is now visible on the overlapping front panels; functional opening/retention is unverified. Next change must structurally improve shorts hip-flexion coverage, replace rear overskirt tails with stable supported construction, and smooth the jacket surface. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
+      "nextAction": "Keep V12 rejected and release blocked. Next revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, and smooth jacket panels. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "01fa616ea421887b7ba480f25a01ba0fd2be0ebb59b1f2a12c58ff683177d1b0",
+      "reportSha256": "0230558a53cb648f57491a60b8d81088e996adaba371b8f016f4a95c24c907e7",
       "metrics": {
         "vertices": 7402,
         "triangles": 14197,
@@ -110,28 +110,28 @@
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "01652e7c625e3ac0aca8ca7deb86dad739fa993f22b50f1e57e5bf8038570606"
+      "sourceSha256": "0770681796af707d148c8506e480969b81605fa2fa45a33b23a92b2b015a2629"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "4da2e095a2a3ba8f1c2fd05a77cabd75d0f4d29c3ddeb6eb86dfa6de1c834ea8",
+      "sha256": "d5711198b5f05a06fb18f9d57777d4efc7b65add8407090e91371545f47be017",
       "findings": [
         {
+          "severity": "BLOCKER",
           "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
-          "severity": "blocker",
-          "description": "V11 crouch and sit renders still expose the gray avatar across the upper inner thighs; the sewn shorts do not maintain opaque hip-flexion coverage, and neutral retains a narrow center gap."
+          "description": "Directly inspected current crouch and sit renders: exposed gray thigh/body surfaces break through the shorts at the inner thighs; the sit pose leaves skin visible to the hip crease. Current garment coverage and pose fit are rejected."
         },
         {
+          "severity": "BLOCKER",
           "code": "OVERSKIRT_POSE_COLLAPSE",
-          "severity": "blocker",
-          "description": "V11 crouch and sit renders retain two long pointed strips below the rear seat. Neutral back is smoother, but the pose deformation remains visibly uncontrolled."
+          "description": "Directly inspected current back, crouch, and sit renders: rear overskirt forms an angular raised block and narrow pointed cloth tails under the seat. Silhouette and pose deformation remain rejected."
         },
         {
+          "severity": "MAJOR",
           "code": "JACKET_SURFACE_QUALITY",
-          "severity": "major",
-          "description": "V11 neutral, crouch and sit renders still show broad faceted wrinkles and pinched folds around sleeves, underarms and jacket waist."
+          "description": "Directly inspected current front, side, arms-up, and arm-cross renders: repeated triangular faceting/shading remains across the sleeves, shoulders, side torso, and waist. Image evidence cannot isolate mesh versus normals."
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T06:24:06.046235+00:00"
+    "generatedAt": "2026-11-27T11:10:17.133681+00:00"
   },
   "blockers": [],
   "outputs": {

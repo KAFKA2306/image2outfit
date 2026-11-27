@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v11-retained-overlap-clasp-20261127",
+  "revision": "v12-bilateral-inner-thigh-follow-20261127",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "severity": "BLOCKER",
       "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
-      "severity": "blocker",
-      "description": "V11 crouch and sit renders still expose the gray avatar across the upper inner thighs; the sewn shorts do not maintain opaque hip-flexion coverage, and neutral retains a narrow center gap."
+      "description": "Directly inspected current crouch and sit renders: exposed gray thigh/body surfaces break through the shorts at the inner thighs; the sit pose leaves skin visible to the hip crease. Current garment coverage and pose fit are rejected."
     },
     {
+      "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "severity": "blocker",
-      "description": "V11 crouch and sit renders retain two long pointed strips below the rear seat. Neutral back is smoother, but the pose deformation remains visibly uncontrolled."
+      "description": "Directly inspected current back, crouch, and sit renders: rear overskirt forms an angular raised block and narrow pointed cloth tails under the seat. Silhouette and pose deformation remain rejected."
     },
     {
+      "severity": "MAJOR",
       "code": "JACKET_SURFACE_QUALITY",
-      "severity": "major",
-      "description": "V11 neutral, crouch and sit renders still show broad faceted wrinkles and pinched folds around sleeves, underarms and jacket waist."
+      "description": "Directly inspected current front, side, arms-up, and arm-cross renders: repeated triangular faceting/shading remains across the sleeves, shoulders, side torso, and waist. Image evidence cannot isolate mesh versus normals."
     }
   ],
   "failedGeometryChecks": [

@@ -17,32 +17,6 @@
       "frameStart": 1,
       "frameEnd": 16,
       "pinMethod": "canonical shared seam vertices",
-      "preBakeBodySurfaceDiagnostic": {
-        "heightRangeM": [
-          0.9734007120132446,
-          1.0522043704986572
-        ],
-        "nearestNormalSignedDistanceM": {
-          "minimum": 0.002434275891573634,
-          "maximum": 0.008114241434668656
-        },
-        "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 1317,
-        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
-      },
-      "postBakeBodySurfaceDiagnostic": {
-        "heightRangeM": [
-          0.9727828502655029,
-          1.0559940338134766
-        ],
-        "nearestNormalSignedDistanceM": {
-          "minimum": 0.003952310807193271,
-          "maximum": 0.015928672037262004
-        },
-        "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 613,
-        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
-      },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "942c35efb02136157906efdc00c09475e2885a0d6873e54600aa42ee61246e0d",
       "evaluatedFrameMeshSha256": "913c85a9a08b0ce957bdfb6c51e3ba89e90bffcb099eef7ebcb83bab3f61d907",
@@ -55,43 +29,7 @@
       "pinVertexCount": 64,
       "frameStart": 1,
       "frameEnd": 16,
-      "componentBending": {
-        "stiffness": 20.0,
-        "maximum": 20.0,
-        "model": "ANGULAR",
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-3753593f917cd3db.json",
-        "evidenceSha256": "3753593f917cd3db728891937826f6ae4e820aab79141acce801077e4130644d",
-        "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance.",
-        "remeasurementPending": true,
-        "grantsFitAcceptance": false
-      },
       "pinMethod": "canonical shared seam vertices",
-      "preBakeBodySurfaceDiagnostic": {
-        "heightRangeM": [
-          0.644578218460083,
-          0.7395782470703125
-        ],
-        "nearestNormalSignedDistanceM": {
-          "minimum": 0.005038495399276144,
-          "maximum": 0.13102319816243835
-        },
-        "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 95,
-        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
-      },
-      "postBakeBodySurfaceDiagnostic": {
-        "heightRangeM": [
-          0.5928435921669006,
-          0.7395782470703125
-        ],
-        "nearestNormalSignedDistanceM": {
-          "minimum": 0.0061800295661669225,
-          "maximum": 0.060756662503195
-        },
-        "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 48,
-        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
-      },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "9499274874297cb31076e021cf483cafc1ffd97d87e1ac435dff68439791535c",
       "evaluatedFrameMeshSha256": "16fd2b627d8813cd604941a1bd3c33634b23a34d7f3e1cb9a80a79c93f455215",
@@ -99,22 +37,21 @@
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "cdf6a1611cb81494028e5091ee5b99e90b1ae121065b07cd3353f60d98db86ad",
-  "constructionSha256": "118cce6be0d2f95f726bd83965b19f8f6c5798104f0928adc6738ddf17d73599",
-  "measurementConstructionSha256": "80e49d1426cd30772739360304dd41af726b231916cf216e1e5ecf5ead9f0c1e",
-  "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype-pleated-overskirt-cdf6a1611cb8.blend",
-  "candidateSha256": "c38194d4abc1b63bafb745e0330f4bd0f662b3a41912a48cf0102755842c3db9",
-  "collisionObjects": [
-    "SiroinoSotai_PC"
-  ],
+  "sourceBlendSha256": "c51d5e81df84168fd591686eb2712e1dde250e16a7976b07fd969168eff1b486",
+  "constructionSha256": "387239118f8c69530b270a1c0955b349e3608b8359a4e2d6499c79a442ae9e76",
+  "measurementConstructionSha256": "387239118f8c69530b270a1c0955b349e3608b8359a4e2d6499c79a442ae9e76",
+  "candidateSha256": "28cacdad1312898c2841467bacbe23c843f23e4216bfc258b6d4b1c60edd3416",
   "qualityDecision": "UNVERIFIED",
   "grantsFitAcceptance": false,
   "bendingRemeasurement": {
     "component": "pleated-overskirt",
-    "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-bf950ebb04db5b31.json",
-    "evidenceSha256": "bf950ebb04db5b3129a03c73a4d1aeb8a1ab0db2bf492423d6ee1a063d514ac3",
-    "measurementConstructionSha256": "80e49d1426cd30772739360304dd41af726b231916cf216e1e5ecf5ead9f0c1e",
+    "evidenceSha256": "0b0de8b2fd2f4258ab5380e2f45a1969b20a124563435b285be1b567ad0c7eca",
+    "measurementConstructionSha256": "387239118f8c69530b270a1c0955b349e3608b8359a4e2d6499c79a442ae9e76",
     "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
   },
-  "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance."
+  "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance.",
+  "evidencePersistence": {
+    "rawEvidenceSha256": "4ee90d74c0af587379e8491931656de1178c9099716afdf484ae677634c897c6",
+    "scope": "Public simulation summary; source paths, body measurements, and detailed geometry remain local."
+  }
 }

@@ -1161,7 +1161,10 @@ def main():
             "deform weights and Shape Keys", "FBX export", "rendered appearance",
             "Unity and VRChat runtime"],
     }
-    report_path = resolve(job["productRoot"] + "/Evidence/Build/product-build-report.json")
+    private_report_path = os.environ.get("IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH")
+    if not private_report_path:
+        raise ValueError("pipeline must provide a private build-report destination")
+    report_path = Path(private_report_path).expanduser().resolve()
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return 2

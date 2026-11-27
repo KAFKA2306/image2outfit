@@ -1671,7 +1671,15 @@ def bake_sewn_prototype(
         "bendingRemeasurement": remeasurement,
         "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance.",
     }
-    write_json(repo_path(str(job["productRoot"])) / "Evidence/Build/cloth-simulation.json", report)
+    raw_report = (
+        ROOT
+        / ".image2outfit"
+        / "products"
+        / str(job["id"])
+        / "cloth"
+        / "cloth-simulation-report.json"
+    )
+    write_json(raw_report, report)
     return 0
 
 
@@ -1787,8 +1795,11 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
         "settledFbx": str(fbx.relative_to(ROOT)).replace("\\", "/"),
     }
     write_json(report_path, report)
+    private_build_report = os.environ.get("IMAGE2OUTFIT_PRIVATE_BUILD_REPORT_PATH")
     build_report = (
-        repo_path(str(job["productRoot"]))
+        Path(private_build_report).expanduser().resolve()
+        if private_build_report
+        else repo_path(str(job["productRoot"]))
         / "Evidence"
         / "Build"
         / "product-build-report.json"

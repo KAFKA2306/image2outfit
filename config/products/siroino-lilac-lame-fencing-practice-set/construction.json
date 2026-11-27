@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v11-retained-overlap-clasp-20261127",
+  "designRevision": "v12-bilateral-inner-thigh-follow-20261127",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -121,8 +121,8 @@
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-bf950ebb04db5b31.json",
-        "evidenceSha256": "bf950ebb04db5b3129a03c73a4d1aeb8a1ab0db2bf492423d6ee1a063d514ac3",
+        "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
+        "evidenceSha256": "fbdc3bb843f03a9c97f02dcabf7e1259a10c65c8377f55b38323dec87faefbdd",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
@@ -190,11 +190,11 @@
           "leftThighBone": "UpperLeg_L",
           "rightThighBone": "UpperLeg_R",
           "waistThighWeight": 0.15,
-          "hemThighWeight": 0.65,
+          "hemThighWeight": 0.85,
           "centerlineHalfWidthM": 0.025,
-          "centerlineThighWeightFraction": 0.0,
+          "centerlineThighWeightFraction": 0.25,
           "fullSideWeightWidthM": 0.09,
-          "evidenceBoundary": "v6 prototype hypothesis: assign zero thigh influence inside the 25 mm centerline band so the integrated crotch rise follows Hips; smoothly fade the ipsilateral thigh influence from that band to the local height profile by 90 mm lateral distance. This deformation trial remains separate from the seam-bound pattern correction; no fit, coverage, pose, penetration, or runtime acceptance."
+          "evidenceBoundary": "V12 prototype hypothesis responding to V11's visible crouch/sit inner-thigh exposure: retain a 25 mm center band with 25% of the height-blended thigh influence split bilaterally, preserve Hips as the majority seam anchor, and raise side hem influence to 0.85 with the existing 90 mm lateral fade. This tests whether bounded bilateral thigh following reduces pose separation while preserving the joined rise; no neutral coverage, fit, ease, pose, penetration, Shape Key, or runtime acceptance is claimed."
         }
       ]
     }
