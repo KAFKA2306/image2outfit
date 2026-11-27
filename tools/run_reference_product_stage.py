@@ -180,12 +180,17 @@ def write_json(path: Path, payload: Mapping[str, Any]) -> Path:
 def evidence(paths: list[Path]) -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
     seen: set[str] = set()
+    seen_paths: set[str] = set()
     for path in paths:
         if not path.is_file():
             raise FileNotFoundError(f"stage evidence file is missing: {relative(path)}")
+        path_key = relative(path)
+        if path_key in seen_paths:
+            continue
+        seen_paths.add(path_key)
         digest = sha256(path)
         if digest in seen:
-            raise ValueError(f"duplicate evidence digest: {relative(path)}")
+            raise ValueError(f"distinct evidence paths share a digest: {relative(path)}")
         seen.add(digest)
         records.append({"path": relative(path), "sha256": digest})
     return records

@@ -43,10 +43,10 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": "canonical-workflow-checkpoint",
-    "nextAction": "Keep V12 rejected and release blocked. Next revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, and smooth jacket panels. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
+    "nextAction": "Keep V12 rejected and release blocked. The smooth-shading trial did not resolve visible jacket faceting. Next garment revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, then isolate and correct the jacket surface geometry. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T11:09:59Z",
+      "checkedAt": "2026-11-27T11:29:03Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -94,7 +94,7 @@
       "failedAttemptEvidenceAvailable": false,
       "blockedStage": null,
       "failureCode": null,
-      "nextAction": "Keep V12 rejected and release blocked. Next revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, and smooth jacket panels. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
+      "nextAction": "Keep V12 rejected and release blocked. The smooth-shading trial did not resolve visible jacket faceting. Next garment revision must structurally close shorts hip-flexion and inner-thigh coverage, replace unsupported rear tail geometry with a stable supported back hem, then isolate and correct the jacket surface geometry. No improvement over V11 is claimed without a matched visual comparison. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -110,13 +110,13 @@
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "0770681796af707d148c8506e480969b81605fa2fa45a33b23a92b2b015a2629"
+      "sourceSha256": "12d1fd6520f55e6d780e0b91239374ff8f2f65c292f14e5f434ee97e18b0f0a4"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "d5711198b5f05a06fb18f9d57777d4efc7b65add8407090e91371545f47be017",
+      "sha256": "694d99546c1d191176f960cba630606204ee01aad93d830d4c265755308b0bb3",
       "findings": [
         {
           "severity": "BLOCKER",
@@ -131,7 +131,7 @@
         {
           "severity": "MAJOR",
           "code": "JACKET_SURFACE_QUALITY",
-          "description": "Directly inspected current front, side, arms-up, and arm-cross renders: repeated triangular faceting/shading remains across the sleeves, shoulders, side torso, and waist. Image evidence cannot isolate mesh versus normals."
+          "description": "Directly inspected current front, side, arms-up, and arm-cross renders after the smooth-shading/export trial: triangular facet highlights remain visible across the sleeves, shoulders, side torso, and waist. Smooth shading did not resolve the visual defect; mesh quality remains rejected."
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T11:10:17.133681+00:00"
+    "generatedAt": "2026-11-27T11:30:20.069971+00:00"
   },
   "blockers": [],
   "outputs": {

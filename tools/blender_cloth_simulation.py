@@ -378,6 +378,15 @@ def sanitize_mesh(obj: bpy.types.Object) -> None:
         bm.free()
     mesh.update(calc_edges=True)
     mesh.validate(verbose=False, clean_customdata=False)
+    # GarmentCode/cloth output is triangulated for the solver and FBX export.
+    # Keep those triangles for the real surface, but shade the sewn cloth as a
+    # continuous fabric surface so each solver triangle does not read as a
+    # hard crease in the rendered garment. Separate trim objects retain their
+    # authored faceting because this is only applied to the canonical panel
+    # mesh carrying piece ownership.
+    if "canonicalPieceIds" in obj and "canonical_piece_index" in mesh.attributes:
+        for polygon in mesh.polygons:
+            polygon.use_smooth = True
 
 
 def export_settled_fbx(
@@ -396,7 +405,7 @@ def export_settled_fbx(
         apply_scale_options="FBX_SCALE_ALL",
         use_space_transform=True,
         bake_space_transform=False,
-        mesh_smooth_type="OFF",
+        mesh_smooth_type="FACE",
         use_subsurf=False,
         use_mesh_modifiers=True,
         use_mesh_edges=False,
