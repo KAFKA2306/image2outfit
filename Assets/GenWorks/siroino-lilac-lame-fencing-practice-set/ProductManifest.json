@@ -43,10 +43,10 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": "canonical-workflow-checkpoint",
-    "nextAction": "Keep V9 rejected and release blocked. For a new revision, redesign shorts hip-flexion coverage and remove unsupported pointed rear tails with an explicit controlled pleat/support topology; correct jacket surface folds and implement a retained closure. Re-render and directly inspect the affected views and poses. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
+    "nextAction": "Keep V10 rejected and release blocked. Change the shorts to an integrated, sewn crotch/gusset topology that provides additional hip-flexion coverage, replace the overskirt fold seed with a supported panel/pleat construction that removes both rear tails, smooth the jacket panel assembly, and add a retained fastening. Generate and directly inspect a new 3D render before acceptance. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-26T18:25:34Z",
+      "checkedAt": "2026-11-27T00:19:05Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -94,49 +94,49 @@
       "failedAttemptEvidenceAvailable": false,
       "blockedStage": null,
       "failureCode": null,
-      "nextAction": "Keep V9 rejected and release blocked. For a new revision, redesign shorts hip-flexion coverage and remove unsupported pointed rear tails with an explicit controlled pleat/support topology; correct jacket surface folds and implement a retained closure. Re-render and directly inspect the affected views and poses. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
+      "nextAction": "Keep V10 rejected and release blocked. Change the shorts to an integrated, sewn crotch/gusset topology that provides additional hip-flexion coverage, replace the overskirt fold seed with a supported panel/pleat construction that removes both rear tails, smooth the jacket panel assembly, and add a retained fastening. Generate and directly inspect a new 3D render before acceptance. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "760bce7fc93adc51c8393abcad9273ff8aa75af13822aac54cd7db05c4979bee",
+      "reportSha256": "036cefed0f064f30953f762b634f3893b746b26c443069d0573201cb6390167c",
       "metrics": {
-        "vertices": 7652,
-        "triangles": 14689,
-        "unweightedVertices": 7652,
+        "vertices": 7402,
+        "triangles": 14197,
+        "unweightedVertices": 7402,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "b022054828c46fd7389bc56d7b9df2a9b04d3afd9107f3dbaad80dc238cf7383"
+      "sourceSha256": "f23719ca044055b0eee5e4e9776161d90e7fdda069a9ecc6ecd5e591a8e44e4a"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "7a0680a3fc184f1f614e40068f587f2eee11c9975197d2110b6908b0a3078ea7",
+      "sha256": "2955c5c34b5077409fc7a6455d95193f11dd9ef7c00479a68e41ca2d7e49b960",
       "findings": [
         {
           "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
           "severity": "blocker",
-          "description": "Direct inspection of front, arm-cross, crouch and sit renders: the shorts hem is visible in neutral but both gray thighs break through the white shorts coverage up to the hips in crouch and sit. A narrow white strip remains between the thighs in neutral. The intended under-short layer does not retain hip-flexion coverage."
+          "description": "V10 crouch and sit renders still show the gray body through the white shorts up across both upper thighs; the under-shorts do not retain hip-flexion coverage. Neutral still shows a narrow center gap."
         },
         {
           "code": "OVERSKIRT_POSE_COLLAPSE",
           "severity": "blocker",
-          "description": "Direct inspection of back, three-quarter, crouch, sit and prone renders: the rear overskirt still forms two long, sharply pointed strips beneath the seat in crouch and sit. The panels collapse into angular tails instead of controlled pleats; the shorter/narrower V9 trial did not resolve this defect."
+          "description": "V10 back, crouch and sit renders still show two long pointed rear strips below the seat. The signed alternating pleat rails did not stabilize the rear hem into controlled folds."
         },
         {
           "code": "JACKET_SURFACE_QUALITY",
           "severity": "major",
-          "description": "Direct inspection of front, side, neutral, arms-up and arm-cross renders: broad faceted wrinkles and pinched folds persist around sleeves, underarms and jacket waist. The surface does not read as a finished smooth fencing jacket."
+          "description": "V10 neutral, arms-up and arm-cross renders retain broad faceted wrinkles and pinched folds around sleeves, underarms and jacket waist."
         },
         {
           "code": "FRONT_CLOSURE_UNFASTENED",
           "severity": "blocker",
-          "description": "The diagonal lilac placket and button-like details are visible, but the prototype construction declares the closure unfastened and no retained fastening is demonstrated. Do not infer closure security or fit from the render."
+          "description": "V10 render shows decorative diagonal placket details but no retained fastening mechanism is defined or evidenced. Closure security and fit remain unverified."
         }
       ],
       "grantsQualityAcceptance": false
@@ -223,7 +223,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-26T18:31:18.033034+00:00"
+    "generatedAt": "2026-11-27T00:20:24.411065+00:00"
   },
   "blockers": [],
   "outputs": {

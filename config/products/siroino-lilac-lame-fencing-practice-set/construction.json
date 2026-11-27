@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "designRevision": "v10-supported-alternating-pleat-rails-20261127",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -115,13 +115,14 @@
       ]
     },
     "prototypeFrameEnd": 16,
+    "remeasureBendingComponentOnInputChange": "pleated-overskirt",
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
     "reason": "A separate inner-thigh insert remained visibly exposed and did not close crouch/sit coverage. This candidate removes the insert and directly joins the paired front and back lower-rise seams; skirt cloth evidence is separately rebound only for unchanged skirt construction. No shorts coverage, fit or pose acceptance is claimed.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-5c410220445b258f.json",
-        "evidenceSha256": "5c410220445b258f8f13a45f5b6c463cb13ef5f85d947f29a8bff7a0997c374d",
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-3753593f917cd3db.json",
+        "evidenceSha256": "3753593f917cd3db728891937826f6ae4e820aab79141acce801077e4130644d",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }

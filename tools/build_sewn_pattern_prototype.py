@@ -795,7 +795,10 @@ def split_declared_skirt_creases(mesh, pose):
     from mathutils import Vector
 
     spec = pose.get("skirtPleatPlacement")
-    if spec is None or spec["method"] != "crease-aligned-triangular-radial-fold":
+    if spec is None or spec["method"] not in {
+        "crease-aligned-triangular-radial-fold",
+        "supported-alternating-radial-pleat-rails-v2",
+    }:
         return {"applied": False}
     count = spec["foldCount"]
     origin = spec["axisOriginBlenderXYM"]
@@ -872,7 +875,7 @@ def split_declared_skirt_creases(mesh, pose):
                 "degenerateTriangleCount": 0, "nonManifoldEdgeCount": non_manifold,
                 "originalVertexIdentityPreserved": True,
                 "grantsFitAcceptance": False, "grantsVisualAcceptance": False,
-                "evidenceBoundary": "Native radial cuts align fold extrema to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."}
+                "evidenceBoundary": "Native radial support rails align alternating pleat crests and valleys to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."}
     finally:
         bm.free()
 
@@ -885,7 +888,11 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     spec = pose.get("skirtPleatPlacement")
     if spec is None:
         return {"applied": False}
-    if spec["method"] not in {"outward-triangular-radial-fold-seed", "crease-aligned-triangular-radial-fold"}:
+    if spec["method"] not in {
+        "outward-triangular-radial-fold-seed",
+        "crease-aligned-triangular-radial-fold",
+        "supported-alternating-radial-pleat-rails-v2",
+    }:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, hem = spec["waistZM"], spec["hemZM"]
@@ -911,7 +918,14 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         native = native_vertices[i]
         angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
         position = ((angle-phase)*count/(2*math.pi)) % 1
-        displacement = depth*blend*(1-abs(2*position-1))
+        if spec["method"] == "supported-alternating-radial-pleat-rails-v2":
+            # Native crease cuts land on both extrema. Alternate the radial
+            # displacement around the circumference so each supported pleat
+            # has a real valley as well as a crest; keep the amplitude inside
+            # the declared neutral-body clearance budget.
+            displacement = depth*blend*math.cos(2*math.pi*position)
+        else:
+            displacement = depth*blend*(1-abs(2*position-1))
         radius = math.hypot(x-origin[0], y-origin[1])
         if radius <= 1e-9:
             raise ValueError("Skirt fold radial coordinate collapsed")
@@ -931,6 +945,11 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "minimumTriangleAreaM2": minimum_area,
             "beforeVerticesSha256": hashlib.sha256(before.encode()).hexdigest(),
             "afterVerticesSha256": hashlib.sha256(json.dumps(mesh["vertices"], separators=(",", ":")).encode()).hexdigest(),
+            "foldProfile": (
+                "alternating-signed-cosine-rails"
+                if spec["method"] == "supported-alternating-radial-pleat-rails-v2"
+                else "outward-triangular"
+            ),
             "canonicalFacesChanged": False, "sewnWaistDisplacementM": 0,
             "grantsFitAcceptance": False, "grantsVisualAcceptance": False}
 

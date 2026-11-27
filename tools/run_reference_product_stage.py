@@ -2073,6 +2073,22 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         construction_path = repo_path(
             job["garmentPipeline"]["constructionPath"], label="construction"
         )
+        construction = read_object(construction_path, "construction")
+        cloth_policy = construction["clothSimulation"]
+        remeasure_component = cloth_policy.get(
+            "remeasureBendingComponentOnInputChange"
+        )
+        if remeasure_component is not None:
+            bending = cloth_policy.get("prototypeComponentBending", {})
+            groups = cloth_policy.get("prototypePanelGroups", {})
+            if (
+                not isinstance(remeasure_component, str)
+                or remeasure_component not in bending
+                or remeasure_component not in groups
+            ):
+                raise ValueError(
+                    "remeasureBendingComponentOnInputChange must name a declared cloth component"
+                )
         source_blend_sha = sha256(blend_path)
         construction_sha = sha256(construction_path)
         reusable = False
@@ -2157,6 +2173,10 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 ),
                 "--prototype",
             ]
+            if remeasure_component is not None:
+                command.extend(
+                    ("--remeasure-bending-component", remeasure_component)
+                )
             execution = subprocess.run(
                 command, cwd=ROOT, capture_output=True, text=True, check=False
             )
@@ -2169,6 +2189,17 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 )
     payload = read_object(report, "cloth simulation report")
     candidate_paths = []
+    measurement = payload.get("bendingRemeasurement")
+    if measurement is not None:
+        if not isinstance(measurement, Mapping):
+            raise ValueError("cloth bending remeasurement record must be an object")
+        evidence_path = repo_path(
+            measurement.get("evidencePath", ""),
+            label="remeasured bending evidence",
+        )
+        if sha256(evidence_path) != measurement.get("evidenceSha256"):
+            raise ValueError("cloth bending remeasurement evidence hash mismatch")
+        candidate_paths.append(evidence_path)
     if simulation_log is not None:
         if payload.get("sourceBlendSha256") != sha256(
             repo_path(
@@ -2182,7 +2213,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         candidate = repo_path(payload["candidatePath"], label="cloth candidate")
         if sha256(candidate) != payload["candidateSha256"]:
             raise ValueError("cloth candidate hash mismatch")
-        candidate_paths = [candidate, simulation_log]
+        candidate_paths.extend([candidate, simulation_log])
     pipeline = job.get("garmentPipeline", {})
     contract_version = (
         int(pipeline.get("stageContractVersion", 1))
