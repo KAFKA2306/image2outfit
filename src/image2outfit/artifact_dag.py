@@ -261,6 +261,7 @@ class PipelineArtifactDAG:
         hypothesis_id: str,
         candidate_id: str,
         avatar_sha256: str,
+        allowed_hypothesis_ids: tuple[str, ...] = (),
     ) -> None:
         contract = self.contract(stage)
         by_kind = {artifact.kind: artifact for artifact in artifacts}
@@ -281,7 +282,9 @@ class PipelineArtifactDAG:
                 ("candidate_id", artifact.candidate_id, candidate_id),
                 ("avatar_sha256", artifact.avatar_sha256, avatar_sha256),
             ):
-                if actual != expected:
+                if actual != expected and not (
+                    label == "hypothesis_id" and actual in allowed_hypothesis_ids
+                ):
                     raise ValueError(
                         f"artifact {kind.value} {label} mismatch: "
                         f"{actual!r} != {expected!r}"

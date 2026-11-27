@@ -86,7 +86,19 @@
       ],
       "radiusM": 0.005,
       "depthM": 0.002,
-      "surfaceOffsetM": 0.004
+      "surfaceOffsetM": 0.004,
+      "retainedBridge": {
+        "pathFraction": 0.48,
+        "lengthM": 0.032,
+        "widthM": 0.012,
+        "thicknessM": 0.0025,
+        "surfaceOffsetM": 0.006,
+        "requiredHostPieceIds": [
+          "jacket-front-left",
+          "jacket-overlap-front"
+        ],
+        "evidenceBoundary": "A visible prototype clasp bridge is raycast onto both canonical overlapping front panels. It records retained closure placement only; opening force, garment strain, fit, appearance acceptance, and runtime remain unverified."
+      }
     }
     },
     "elbowQuilting": {

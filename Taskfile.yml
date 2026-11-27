@@ -27,7 +27,7 @@ tasks:
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
       UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
-      - 'uv run --no-cache --locked --no-default-groups --python 3.11 python tools/run_garment_pipeline.py --request "config/pipeline/requests/{{.PRODUCT}}.json" {{if .RESUME_STATE}}--resume-state "{{.RESUME_STATE}}" {{end}}--execute --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"'
+      - 'uv run --no-cache --locked --no-default-groups --python 3.11 python tools/run_garment_pipeline.py --request "config/pipeline/requests/{{.PRODUCT}}.json" {{if .RESUME_STATE}}--resume-state "{{.RESUME_STATE}}" {{end}}{{if .RESTART_FROM_STAGE}}--restart-from-stage "{{.RESTART_FROM_STAGE}}" {{end}}{{if .ALLOW_PREFIX_EVIDENCE_DRIFT}}--allow-prefix-evidence-drift "{{.ALLOW_PREFIX_EVIDENCE_DRIFT}}" {{end}}{{if .ALLOW_PREFIX_EVIDENCE_DRIFT_2}}--allow-prefix-evidence-drift "{{.ALLOW_PREFIX_EVIDENCE_DRIFT_2}}" {{end}}{{if .ALLOW_PREFIX_EVIDENCE_DRIFT_3}}--allow-prefix-evidence-drift "{{.ALLOW_PREFIX_EVIDENCE_DRIFT_3}}" {{end}}--execute --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"'
 
   batch:status:
     desc: Summarize the existing per-product execution states for a tracked batch.

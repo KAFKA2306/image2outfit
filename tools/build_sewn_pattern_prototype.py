@@ -351,6 +351,87 @@ def add_prototype_surface_motifs(mesh, job, recipe):
                                 "radiusM": radius, "depthM": depth,
                                 "grantsFitOrAppearanceAcceptance": False})
 
+    # Add one visible bridge across the overlap itself. The round studs above
+    # are decorative; this bounded bar is the retained closure hypothesis and
+    # must have sampled vertices on both canonical front panels. Keeping this
+    # fail-closed prevents a button-only plastron from being mislabeled as a
+    # fastening when the overlap moves in a later construction revision.
+    bridge = fastener_spec.get("retainedBridge")
+    bridge_audit = None
+    if bridge is not None:
+        if not isinstance(bridge, dict):
+            raise ValueError("prototype retainedBridge must be an object")
+        bridge_fraction = float(bridge.get("pathFraction", 0.5))
+        bridge_length = float(bridge.get("lengthM", 0.032))
+        bridge_width = float(bridge.get("widthM", 0.012))
+        bridge_thickness = float(bridge.get("thicknessM", 0.0025))
+        bridge_offset = float(bridge.get("surfaceOffsetM", 0.006))
+        expected_hosts = bridge.get("requiredHostPieceIds")
+        if (not 0.08 <= bridge_fraction <= 0.98
+                or not 0.01 <= bridge_length <= 0.06
+                or not 0.004 <= bridge_width <= 0.024
+                or not 0.0005 <= bridge_thickness <= 0.006
+                or not 0.001 <= bridge_offset <= 0.01
+                or not isinstance(expected_hosts, list) or len(set(expected_hosts)) != 2):
+            raise ValueError("Invalid retained closure bridge dimensions or hosts")
+        tangent = Vector((dx / length, 0.0, dz / length))
+        across = Vector((normal_x, 0.0, normal_z))
+        center_x = float(start[0]) + dx * bridge_fraction
+        center_z = float(start[1]) + dz * bridge_fraction
+        corners = []
+        corner_owners = []
+        for along, side in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            xz = (Vector((center_x, 0.0, center_z))
+                  + tangent * (along * bridge_length / 2)
+                  + across * (side * bridge_width / 2))
+            point, owner = surface_point(
+                front_tree, xz.x, xz.z,
+                float(plastron.get("frontQueryYM", -0.16)), bridge_offset,
+            )
+            corners.append(point)
+            corner_owners.append(owner)
+        observed_hosts = sorted(set(corner_owners))
+        if not set(expected_hosts).issubset(observed_hosts):
+            raise ValueError(
+                "Retained closure bridge does not cross both declared panels: "
+                f"expected={sorted(expected_hosts)}, observed={observed_hosts}"
+            )
+        # A shallow solid bar reads as a small textile clasp and remains above
+        # the two cloth layers. Coordinates already include the measured ray
+        # hit and explicit normal clearance; no surface is substituted.
+        bridge_vertices = [list(point) for point in corners]
+        bridge_vertices.extend([[point.x, point.y + bridge_thickness, point.z]
+                                for point in corners])
+        bridge_faces = [
+            (0, 1, 2, 3), (7, 6, 5, 4),
+            (0, 4, 5, 1), (1, 5, 6, 2),
+            (2, 6, 7, 3), (3, 7, 4, 0),
+        ]
+        bridge_data = bpy.data.meshes.new(f"{job['id']}-prototype-retained-closure")
+        bridge_data.from_pydata(bridge_vertices, [], bridge_faces)
+        bridge_data.update()
+        bridge_obj = bpy.data.objects.new(
+            f"{job['id']}-prototype-retained-closure", bridge_data
+        )
+        bpy.context.collection.objects.link(bridge_obj)
+        bridge_obj.data.materials.append(hardware_material)
+        face_owners = [corner_owners[0], corner_owners[0],
+                       corner_owners[0], corner_owners[1],
+                       corner_owners[2], corner_owners[3]]
+        bind_piece_ownership(bridge_obj, expected_hosts, face_owners)
+        bridge_obj["prototypeRole"] = "unfitted-overlap-closure-bridge-hypothesis"
+        bridge_obj["retainedClosure"] = True
+        bridge_audit = {
+            "object": bridge_obj.name,
+            "hostPieceIds": observed_hosts,
+            "pathFraction": bridge_fraction,
+            "lengthM": bridge_length,
+            "widthM": bridge_width,
+            "thicknessM": bridge_thickness,
+            "surfaceOffsetM": bridge_offset,
+            "grantsFitOrAppearanceAcceptance": False,
+        }
+
     quilt = spec.get("elbowQuilting")
     if not isinstance(quilt, dict):
         raise ValueError("prototypeSurfaceMotifs elbowQuilting must be an object")
@@ -437,6 +518,7 @@ def add_prototype_surface_motifs(mesh, job, recipe):
             "grantsAppearanceAcceptance": False,
         },
         "fasteners": fastener_audits,
+            "retainedClosureBridge": bridge_audit,
         "elbowQuilting": quilt_audits,
         "grantsFitOrAppearanceAcceptance": False,
         "evidenceBoundary": spec.get(

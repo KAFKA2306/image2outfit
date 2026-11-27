@@ -580,7 +580,10 @@
       ],
       "properties": {
         "status": {
-          "const": "PROTOTYPE_OVERLAP_UNFASTENED"
+          "enum": [
+            "PROTOTYPE_OVERLAP_UNFASTENED",
+            "PROTOTYPE_RETAINED_OVERLAP_CLASP"
+          ]
         },
         "outerPieceId": {
           "type": "string",
@@ -607,7 +610,10 @@
           "minLength": 1
         },
         "fastenerStatus": {
-          "const": "NOT_IMPLEMENTED"
+          "enum": [
+            "NOT_IMPLEMENTED",
+            "RAYCAST_BOUND_BRIDGE_HYPOTHESIS"
+          ]
         },
         "evidenceBoundary": {
           "type": "string",

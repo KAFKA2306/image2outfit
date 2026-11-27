@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v10-supported-alternating-pleat-rails-20261127",
+  "designRevision": "v11-retained-overlap-clasp-20261127",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -121,22 +121,22 @@
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-3753593f917cd3db.json",
-        "evidenceSha256": "3753593f917cd3db728891937826f6ae4e820aab79141acce801077e4130644d",
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-component-rebind-bf950ebb04db5b31.json",
+        "evidenceSha256": "bf950ebb04db5b3129a03c73a4d1aeb8a1ab0db2bf492423d6ee1a063d514ac3",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
   },
   "frontClosure": {
-    "status": "PROTOTYPE_OVERLAP_UNFASTENED",
+    "status": "PROTOTYPE_RETAINED_OVERLAP_CLASP",
     "outerPieceId": "jacket-overlap-front",
     "underPieceId": "jacket-front-left",
     "diagonalEdgeId": "front-opening",
     "outerHemExtensionAcrossCenterM": 0.04,
     "outerExclusiveVertexLayerOffsetM": 0.002,
     "construction": "Right-front hem crosses center by 40 mm in local pattern coordinates, tapering to zero at the upper opening; left front supplies continuous underlay to center. Existing shoulder and side seams retain their common vertices.",
-    "fastenerStatus": "NOT_IMPLEMENTED",
-    "evidenceBoundary": "Corrects a cut-away lower front into an actual overlap hypothesis. 40 mm extension and 2 mm spacing are design hypotheses, not avatar-approved ease. Closure anchoring, dynamic overlap separation, trim and final fit remain unverified."
+    "fastenerStatus": "RAYCAST_BOUND_BRIDGE_HYPOTHESIS",
+    "evidenceBoundary": "Corrects a cut-away lower front into an overlap hypothesis and adds a shallow clasp bridge raycast-bound across both canonical layers. 40 mm extension, 2 mm spacing and clasp dimensions are design hypotheses, not avatar-approved ease. Opening force, fabric strain, fit, appearance and runtime remain unverified."
   },
   "prototypeWeightRegions": [
     {

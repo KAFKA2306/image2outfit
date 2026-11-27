@@ -115,6 +115,17 @@ def validate_runtime_artifact_inputs(
     resolved = PipelineStage(stage)
     refs = _completed_refs(state)
     garment_id, hypothesis_id, candidate_id, avatar_sha256 = _identity(state)
+    history = state.get("resume_history", [])
+    drift = (
+        history[-1].get("source_fingerprint_drift", {})
+        if isinstance(history, list) and history and isinstance(history[-1], Mapping)
+        else {}
+    )
+    allowed_hypothesis_ids = ()
+    if drift.get("reusedPreviousRevisionArtifacts") is True:
+        previous_revision = drift.get("previousRevisionId")
+        if isinstance(previous_revision, str) and previous_revision:
+            allowed_hypothesis_ids = (previous_revision,)
     _DAG.validate_inputs(
         resolved,
         refs,
@@ -122,6 +133,7 @@ def validate_runtime_artifact_inputs(
         hypothesis_id=hypothesis_id,
         candidate_id=candidate_id,
         avatar_sha256=avatar_sha256,
+        allowed_hypothesis_ids=allowed_hypothesis_ids,
     )
     required = set(_DAG.contract(resolved).consumes)
     for ref in refs:

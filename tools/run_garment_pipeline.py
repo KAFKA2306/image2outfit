@@ -72,6 +72,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resume-state", type=Path)
     parser.add_argument("--checkpoint-output", type=Path)
     parser.add_argument(
+        "--restart-from-stage",
+        choices=tuple(stage.value for stage in PIPELINE_STAGES),
+        help=(
+            "On an explicit resume, reuse the hash-verified immutable prefix "
+            "and rebuild from this stage. Required when resuming a changed revision."
+        ),
+    )
+    parser.add_argument(
+        "--allow-prefix-evidence-drift",
+        action="append",
+        default=[],
+        metavar="REPO_PATH",
+        help=(
+            "Explicitly acknowledge a changed evidence source used only by the "
+            "reused prefix; each path is recorded in resume history."
+        ),
+    )
+    parser.add_argument(
         "--audit-root",
         type=Path,
         default=Path(".image2outfit/audit"),
@@ -251,10 +269,38 @@ def _resume_or_reset(
     expected: dict[str, str],
     mode: ExecutionMode,
     allow_verified_prefix_on_source_change: bool = False,
+    restart_from_stage: str | None = None,
+    allow_prefix_evidence_drift: tuple[str, ...] = (),
 ) -> dict[str, Any]:
+    if restart_from_stage is not None:
+        # The mutable working stage JSONs may have been replaced by an
+        # interrupted newer run. Prefer their immutable copies from the old
+        # audit bundle, but only when those copies exactly match the recorded
+        # executed result.
+        restored = dict(previous)
+        restored_records = [dict(record) for record in previous.get("stage_records", [])]
+        run_id = str(previous.get("run_id", ""))
+        for index, record in enumerate(restored_records):
+            stage = str(record.get("stage", ""))
+            archived = (
+                ROOT / ".image2outfit" / "audit" / str(previous.get("product_id", ""))
+                / run_id / "stages" / f"{index + 1:02d}-{stage}.json"
+            )
+            output = record.get("output", {})
+            result = output.get("result") if isinstance(output, dict) else None
+            if archived.is_file() and isinstance(result, dict):
+                try:
+                    if _read_object(archived, label="immutable archived stage result") == result:
+                        record["resultPath"] = archived.relative_to(ROOT).as_posix()
+                except (OSError, ValueError):
+                    pass
+        restored["stage_records"] = restored_records
+        previous = restored
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
     allowed_drift = {"sourceFingerprint"}
+    if restart_from_stage is not None:
+        allowed_drift.add("revisionId")
     if allow_verified_prefix_on_source_change and "sourceFingerprint" in mismatches:
         # A new product revision necessarily has different hypothesis-bound
         # artifact refs. Allow the explicit resume path to verify reusable
@@ -266,7 +312,7 @@ def _resume_or_reset(
     ]
     if non_source_mismatches:
         _assert_identity(previous, expected)
-    if "sourceFingerprint" not in mismatches:
+    if "sourceFingerprint" not in mismatches and restart_from_stage is None:
         _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
 
@@ -281,6 +327,18 @@ def _resume_or_reset(
                 records_by_stage[record["stage"]] = record
         origin = str(previous.get("run_id", ""))
         history = previous.get("resume_history", [])
+        inherited_revisions = {str(previous.get("revision_id", ""))}
+        if isinstance(history, list):
+            for item in history:
+                if not isinstance(item, dict):
+                    continue
+                drift = item.get("source_fingerprint_drift", {})
+                if (
+                    isinstance(drift, dict)
+                    and drift.get("reusedPreviousRevisionArtifacts") is True
+                    and isinstance(drift.get("previousRevisionId"), str)
+                ):
+                    inherited_revisions.add(drift["previousRevisionId"])
         if history and isinstance(history[0], dict):
             origin = str(history[0].get("parent_run_id") or origin)
         elif previous.get("parent_run_id"):
@@ -289,7 +347,20 @@ def _resume_or_reset(
             expected["targetAvatar"].encode("utf-8")
         ).hexdigest()
         artifact_dag = PipelineArtifactDAG()
-        for stage in previous.get("completed_stages", []):
+        canonical_stages = [stage.value for stage in PIPELINE_STAGES]
+        restart_index = (
+            canonical_stages.index(restart_from_stage)
+            if restart_from_stage is not None
+            else len(canonical_stages)
+        )
+        acknowledged_paths = {
+            _repo_path(Path(value), label="allowed prefix evidence drift").relative_to(ROOT).as_posix(): value
+            for value in allow_prefix_evidence_drift
+        }
+        observed_evidence_drift: list[dict[str, str]] = []
+        for stage_index, stage in enumerate(previous.get("completed_stages", [])):
+            if stage_index >= restart_index:
+                break
             output = outputs.get(stage, {})
             stage_record = records_by_stage.get(stage, {})
             record_output = stage_record.get("output", {})
@@ -307,12 +378,52 @@ def _resume_or_reset(
                 result_path = stage_record.get("resultPath")
                 if not isinstance(result_path, str) or not result_path:
                     break
-                stage_result = _read_object(
+                archive_result = (
+                    ROOT
+                    / ".image2outfit"
+                    / "audit"
+                    / expected["productId"]
+                    / str(previous.get("run_id", ""))
+                    / "stages"
+                    / f"{stage_index + 1:02d}-{stage}.json"
+                )
+                if archive_result.is_file():
+                    result_path = archive_result.relative_to(ROOT).as_posix()
+                stage_result_document = _read_object(
                     _repo_path(Path(result_path), label="resumed stage result"),
                     label="resumed stage result",
                 )
+                archived_result = (
+                    stage_result_document.get("output", {}).get("result")
+                    if isinstance(stage_result_document.get("output"), dict)
+                    else None
+                )
+                stage_result = (
+                    archived_result if isinstance(archived_result, dict) else stage_result_document
+                )
                 if stage_result != record_output["result"]:
                     break
+                for evidence in stage_result.get("evidence", []):
+                    if not isinstance(evidence, dict):
+                        continue
+                    evidence_path = evidence.get("path")
+                    evidence_sha = evidence.get("sha256")
+                    if not isinstance(evidence_path, str) or not isinstance(evidence_sha, str):
+                        continue
+                    current_path = _repo_path(Path(evidence_path), label="prefix evidence")
+                    if not current_path.is_file():
+                        current_sha = "MISSING"
+                    else:
+                        current_sha = hashlib.sha256(current_path.read_bytes()).hexdigest()
+                    if current_sha != evidence_sha:
+                        relative = current_path.relative_to(ROOT).as_posix()
+                        if relative not in acknowledged_paths:
+                            raise ValueError(
+                                f"reused prefix evidence changed without explicit acknowledgement: {relative}"
+                            )
+                        observed_evidence_drift.append(
+                            {"path": relative, "previousSha256": evidence_sha, "currentSha256": current_sha}
+                        )
                 ref = ArtifactRef(
                     kind=ArtifactKind(str(raw_ref["kind"])),
                     producer_stage=PipelineStage(str(raw_ref["producer_stage"])),
@@ -328,7 +439,10 @@ def _resume_or_reset(
                     ref.producer_stage.value != stage
                     or ref.kind != artifact_dag.contract(stage).produces
                     or ref.garment_id != expected["productId"]
-                    or ref.hypothesis_id != expected["revisionId"]
+                    or (
+                        ref.hypothesis_id != expected["revisionId"]
+                        and not (restart_from_stage is not None and ref.hypothesis_id in inherited_revisions)
+                    )
                     or ref.candidate_id != origin
                     or ref.avatar_sha256 != avatar_sha256
                 ):
@@ -337,6 +451,12 @@ def _resume_or_reset(
             except (KeyError, TypeError, ValueError, OSError):
                 break
             prefix.append(stage)
+
+        if restart_from_stage is not None and len(prefix) != restart_index:
+            raise ValueError(
+                "requested restart stage does not have a complete, hash-verified "
+                f"prefix: requested={restart_from_stage}, verified={len(prefix)}"
+            )
 
         if prefix:
             reused = dict(previous)
@@ -361,7 +481,14 @@ def _resume_or_reset(
                     if len(prefix) < len(previous.get("completed_stages", []))
                     else resumed.get("current_stage", "")
                 ),
+                "restartFromStage": restart_from_stage,
+                "previousRevisionId": str(previous.get("revision_id", "")),
+                "currentRevisionId": expected["revisionId"],
+                "reusedPreviousRevisionArtifacts": str(previous.get("revision_id", ""))
+                != expected["revisionId"],
+                "acknowledgedEvidenceDrift": observed_evidence_drift,
             }
+            resumed["revision_id"] = expected["revisionId"]
             return resumed
 
     state = _new_state(request, expected, mode)
@@ -477,6 +604,8 @@ def main() -> int:
                 expected=expected,
                 mode=mode,
                 allow_verified_prefix_on_source_change=args.resume_state is not None,
+                restart_from_stage=args.restart_from_stage,
+                allow_prefix_evidence_drift=tuple(args.allow_prefix_evidence_drift),
             )
             if state.get("checkpoint_reset"):
                 print(

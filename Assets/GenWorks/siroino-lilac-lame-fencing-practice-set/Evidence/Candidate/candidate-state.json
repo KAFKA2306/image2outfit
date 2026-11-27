@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v10-supported-alternating-pleat-rails-20261127",
+  "revision": "v11-retained-overlap-clasp-20261127",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -21,22 +21,17 @@
     {
       "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
       "severity": "blocker",
-      "description": "V10 crouch and sit renders still show the gray body through the white shorts up across both upper thighs; the under-shorts do not retain hip-flexion coverage. Neutral still shows a narrow center gap."
+      "description": "V11 crouch and sit renders still expose the gray avatar across the upper inner thighs; the sewn shorts do not maintain opaque hip-flexion coverage, and neutral retains a narrow center gap."
     },
     {
       "code": "OVERSKIRT_POSE_COLLAPSE",
       "severity": "blocker",
-      "description": "V10 back, crouch and sit renders still show two long pointed rear strips below the seat. The signed alternating pleat rails did not stabilize the rear hem into controlled folds."
+      "description": "V11 crouch and sit renders retain two long pointed strips below the rear seat. Neutral back is smoother, but the pose deformation remains visibly uncontrolled."
     },
     {
       "code": "JACKET_SURFACE_QUALITY",
       "severity": "major",
-      "description": "V10 neutral, arms-up and arm-cross renders retain broad faceted wrinkles and pinched folds around sleeves, underarms and jacket waist."
-    },
-    {
-      "code": "FRONT_CLOSURE_UNFASTENED",
-      "severity": "blocker",
-      "description": "V10 render shows decorative diagonal placket details but no retained fastening mechanism is defined or evidenced. Closure security and fit remain unverified."
+      "description": "V11 neutral, crouch and sit renders still show broad faceted wrinkles and pinched folds around sleeves, underarms and jacket waist."
     }
   ],
   "failedGeometryChecks": [
