@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v13-hip-anchored-medial-band-20261127",
+  "designRevision": "v14-crotch-bridge-geometry-20261127",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -57,7 +57,7 @@
         "shorts-back-left",
         "shorts-back-right"
       ],
-      "reason": "v8 prototype: raise the outer leg hem to local pattern Y -0.055..-0.030 m but place the inner endpoint at Y -0.160 m below the center-rise terminus at -0.140 m, retaining the deeper center-front/back rise. Altered sewn endpoints align to declared wrap bounds. Keep existing panel/stitch IDs; dimensions, coverage, ease, pose and runtime remain unverified hypotheses."
+      "reason": "V14 changes the paired lower-rise endpoint from local pattern Y -0.160 m to -0.180 m and expands the lower leg-wrap outer bound from 0.220 m to 0.280 m, tapering to the existing 0.252 m thigh bound. The four canonical panel IDs and mirrored front/back rise seam pairs remain. This is a structural coverage trial after V13 hip-anchored weights showed no visible crouch/sit improvement; 2D panel validity, neutral coverage, ease, fit, pose and runtime remain unverified."
     }
   ],
   "separateGeometry": [
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "The concept shows jacket, overskirt, and shorts appearance; it does not establish sewing order, dimensions, allowance, fabric stretch, avatar fitting, or deformation."
+    "review": "V14 increases the lower four-panel shorts wrap width at the crotch end. It is a structural 3D placement hypothesis after V13 weight changes did not visibly improve crouch/sit inner-thigh coverage; ease, clearance and motion remain unverified."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -122,7 +122,7 @@
       "pleated-overskirt": {
         "stiffness": 20,
         "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
-        "evidenceSha256": "fbdc3bb843f03a9c97f02dcabf7e1259a10c65c8377f55b38323dec87faefbdd",
+        "evidenceSha256": "dc05e58b7a28c2a5f4b347516ff408f70921f61aae61ef34369666ac9752e68b",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }

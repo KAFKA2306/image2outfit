@@ -43,10 +43,10 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": "canonical-workflow-checkpoint",
-    "nextAction": "Keep V13 rejected and release blocked. Do not repeat centerline-weight tuning: matched V12/V13 crouch and sit views show no visible coverage gain. Redesign the shorts crotch/inner-thigh pattern geometry or seam support, then replace the unsupported rear overskirt tail shape and correct jacket surface topology. Re-render and directly review before claiming progress. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED.",
+    "nextAction": "V14 shows a visible shorts-bridge change, but keep appearance rejected and release blocked: redesign rear overskirt volume/panel support to remove pointed tails and blocky seat collapse, then repair jacket topology/faceting. Preserve the new crotch bridge for fit/clearance review; do not mark fit accepted. Re-render all poses after changes. UV remains NOT_CREATED; target runtime, Shape Keys, Unity/VRChat, package and release remain UNVERIFIED.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T12:11:47Z",
+      "checkedAt": "2026-11-27T14:20:07Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -94,44 +94,44 @@
       "failedAttemptEvidenceAvailable": false,
       "blockedStage": null,
       "failureCode": null,
-      "nextAction": "Keep V13 rejected and release blocked. Do not repeat centerline-weight tuning: matched V12/V13 crouch and sit views show no visible coverage gain. Redesign the shorts crotch/inner-thigh pattern geometry or seam support, then replace the unsupported rear overskirt tail shape and correct jacket surface topology. Re-render and directly review before claiming progress. UV remains NOT_CREATED; fit, Shape Keys, Unity/VRChat runtime, package and release remain UNVERIFIED."
+      "nextAction": "V14 shows a visible shorts-bridge change, but keep appearance rejected and release blocked: redesign rear overskirt volume/panel support to remove pointed tails and blocky seat collapse, then repair jacket topology/faceting. Preserve the new crotch bridge for fit/clearance review; do not mark fit accepted. Re-render all poses after changes. UV remains NOT_CREATED; target runtime, Shape Keys, Unity/VRChat, package and release remain UNVERIFIED."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "0230558a53cb648f57491a60b8d81088e996adaba371b8f016f4a95c24c907e7",
+      "reportSha256": "e41458cf22306edc14c1eec52234da2bfc3a4e145b7f8300b9c66761f0f54a63",
       "metrics": {
-        "vertices": 7402,
-        "triangles": 14197,
-        "unweightedVertices": 7402,
+        "vertices": 7426,
+        "triangles": 14237,
+        "unweightedVertices": 7426,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "13f5139e393c9cdf5a1daaa609ea56173a4504a52d0b4a249505b9cb8e5d2b37"
+      "sourceSha256": "06ece83e4de0bef1c3ebe4892d978cf9cb4294a8d08d1e8bd812e54ed6f9083b"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "e04dbe8a2a00512150895b588ac94281a4cc0e0b6858c9b75fdec700dafbd4fd",
+      "sha256": "47f0dc78f7866ddee3475ebaa40792c2a3e9a1822be9220e5b9d04a2c5339c4c",
       "findings": [
         {
-          "code": "SHORTS_COVERAGE_AND_CROTCH_GAP",
+          "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
           "severity": "BLOCKER",
-          "description": "Direct V13 inspection of crouch and sit, compared side by side with the V12 captures: the wider Hips-anchored medial weight band does not produce a visible closure of the inner-thigh/hip-crease gap. Shorts coverage and pose fit remain rejected; no improvement is claimed."
+          "description": "The crouch and sit previews show the new lower-rise textile bridge without an obvious skin-through opening from these camera views. This is a visual observation of V14 only; no side-by-side comparative gain, clearance, strain, boundary coverage from other angles, or pose acceptance is claimed. Shorts fit remains unverified."
         },
         {
           "code": "OVERSKIRT_POSE_COLLAPSE",
           "severity": "BLOCKER",
-          "description": "Current back, crouch and sit renders still show an angular raised rear block and narrow pointed cloth tails under the seat. Silhouette and pose deformation remain rejected."
+          "description": "Back, crouch and sit renders still show an angular raised rear block and narrow pointed cloth tails under the seat. Silhouette and pose deformation remain rejected."
         },
         {
           "code": "JACKET_SURFACE_QUALITY",
           "severity": "MAJOR",
-          "description": "Current front, side, arms-up and arm-cross renders still show triangular facet highlights across sleeves, shoulders, side torso and waist. Smooth shading remains ineffective; mesh surface quality is rejected."
+          "description": "Front, side, arms-up and arm-cross renders still show triangular faceting across sleeves, shoulders, side torso and waist. Surface quality is rejected."
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T12:13:46.626979+00:00"
+    "generatedAt": "2026-11-27T14:20:22.124413+00:00"
   },
   "blockers": [],
   "outputs": {
