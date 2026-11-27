@@ -52,12 +52,14 @@ jobs:
           cat > "$source_list" <<EOF
           Types: deb
           URIs: http://archive.ubuntu.com/ubuntu
+          Architectures: amd64
           Suites: $ubuntu_codename $ubuntu_codename-updates $ubuntu_codename-backports
           Components: main universe restricted multiverse
           Signed-By: $keyring
 
           Types: deb
           URIs: http://security.ubuntu.com/ubuntu
+          Architectures: amd64
           Suites: $ubuntu_codename-security
           Components: main universe restricted multiverse
           Signed-By: $keyring
