@@ -2,40 +2,38 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewedRevision": "v16-skirt-center-fold-valley-20261128",
+  "reviewedRevision": "v17-hip-only-skirt-pose-isolation-20261128",
   "reviewer": "chatgpt:Codex direct review",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f0f1e7883e21270cff4cca1f8282536303d240c7fc5dbd1a6bda856ddb26e120",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "c121e4728c0ba5c33e469d2612436c0a14b84fede00c4f6cbca17927af194dbe",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "3abbbab2b8935e6462e2b24b91644ac0e156f095c660a91135fd6817db8cf75f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "0f13ef1c6957e11521b2275ac41f8a3e2601705183d945e7400355c11eeaad04",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "f94c3c9b329c0c8287b975d65cb168220a373dde1ed4932ca87f0a434fb714a6",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "46897fd0cada391d72715accf54d0bbc52f312e4a413b4e6a384d87446088ff4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "9c94ef1b13d92ae2fd84d96d82ab2a21fc572b7dcf791a72804074d52bbc31c0",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "95130733fa7074fbfe8ca68c21802a97d27fd23766dd0e13984ae2d2dac4adcc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "6d11de72ae1c287d715a21ce03d5147e39fe06d946c5e8429e53d2910fc90e9b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "523e7b2b3360e9a032840ab4010a4534d07cfe60f5896a9152fd8a21d988c305",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "3cd23b988392b2782a4fe26f077575b53bba25c01aba508df4f18b629cb1c1f9"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "a9fa18c8b292d38689a38f18bfbf2c5077739f5a36836d2ed2d30699a6eab9cb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "a7c15552e8b5cd39c7eafc40a4b6cc1d3734d993a60af2353e6d906e319b94d4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "0fa6b01f4e1f8fca287d6e253b1bc2fbef7bf874370988f26e00d0872000aaa9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "a142d397e8559d5392543635502448e76fe113db85cfb781c059602759aa02ea",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "17519d281f0ea35b1aae6db1b885cb04df23a77476946a26487428fd0a00a54c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "b053c2a963360a89d7d604ec4b0175743f3a51dade4fcc14364067f800de13e9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "f44cf4fd32b95813807a39660e00f13850a791a5de3e8ac9f1fe43899fa34ceb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "f8362879e25466a77662905eb4a2713d5a7fb170a8e46e17a76906babc12b996",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "ca7cb9bf072caebbe775fb1e1b49e0a68af86e13afcf0677ae013f192d031f1c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "cf1085dbb5ba99009dd6fad40541b45ac07568a2b01ba53b2caac9d25a8884cb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "0d035c1b4f4051608912a89121274e858cf240b30e2f83320afda7f839a5f7f9"
   },
   "findings": [
     {
       "severity": "BLOCKER",
-      "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-      "description": "V16 crouch and sit renders still crowd the under-shorts and thighs at the inner hip crease. These fixed views do not establish continuous boundary coverage, clearance or strain; shorts fit remains unverified and rejected."
+      "code": "OVERSKIRT_POSE_COLLAPSE",
+      "description": "Directly inspected all five angle views and six pose renders for V17. The measured overskirt group contains 1,330 vertices with one influence each and no upper-leg groups, isolating Hips-only skinning. Despite that change, the back render retains a raised central panel patch and crouch/sit retain long, pointed tails below the seat. Removing thigh-bone transfer alone did not resolve the defect; pose silhouette remains rejected."
     },
     {
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "The V16 back view still has an angular raised block at center back, and crouch/sit retain two narrow pointed cloth tails below the seat. Moving the eight-cycle fold phase by pi/8 did not remove these visible defects. Silhouette and pose deformation remain rejected."
+      "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
+      "description": "V17 crouch and sit still show the undershorts and inner-hip boundary crowded by the pose. These fixed images do not establish continuous garment coverage, clearance or strain; fit remains unverified and rejected."
     },
     {
       "severity": "MAJOR",
       "code": "JACKET_SURFACE_QUALITY",
-      "description": "V16 front, side, arms-up and arm-cross renders still show triangular faceting across sleeves, shoulders, side torso and waist. Surface quality is rejected."
+      "description": "V17 front, side, back and posed renders still show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
     }
-  ],
-  "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/render-evidence.json",
-  "nextAction": "V16 phase shift did not alter the center-back block or pointed tails. Keep appearance rejected and release blocked. Change the cloth-simulation support/settling method or add an explicit rear-panel pose support using current mesh and pose evidence, then re-render all poses. Do not mark fit accepted. UV remains NOT_CREATED; target runtime, Shape Keys, Unity/VRChat, package and release remain UNVERIFIED."
+  ]
 }

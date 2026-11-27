@@ -39,7 +39,25 @@ jobs:
           version: '0.11.32'
           enable-cache: true
       - name: Install Blender runtime libraries
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+        run: |
+          set -euo pipefail
+          apt_sources="$(mktemp -d)"
+          trap 'rm -rf "$apt_sources"' EXIT
+          while IFS= read -r -d '' source; do
+            if grep -Eqi 'archive\.ubuntu\.com|security\.ubuntu\.com|ports\.ubuntu\.com' "$source"; then
+              cp "$source" "$apt_sources/$(basename "$source")"
+            fi
+          done < <(find /etc/apt -maxdepth 2 -type f \( -name '*.list' -o -name '*.sources' \) -print0)
+          test -n "$(find "$apt_sources" -type f -print -quit)"
+          printf 'Using Ubuntu apt sources:\n'
+          find "$apt_sources" -maxdepth 1 -type f -printf '%f\n' | sort
+          sudo apt-get \
+            -o Dir::Etc::sourcelist=/dev/null \
+            -o Dir::Etc::sourceparts="$apt_sources" \
+            update
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
+            libgl1 libegl1 libx11-6 libxxf86vm1
       - name: Download pinned Blender
         run: |
           BLENDER_VERSION="$(python -c "import json; print(json.load(open('config/toolchain-lock.json'))['blender']['version'])")"

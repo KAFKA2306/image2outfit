@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v16-skirt-center-fold-valley-20261128",
+  "designRevision": "v17-hip-only-skirt-pose-isolation-20261128",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V16 retains V15's measured hip-supported bilateral skirt weights and changes only the eight-cycle radial fold phase. The V15 back and seated renders show a sharp raised fold at the back center seam and two narrow tails below the seat; with eight cycles the cardinal center seams align to cosine crests at phase 0. A pi/8 phase moves those center seams to valleys while preserving the 45-degree cycle spacing. This is a geometry hypothesis for reducing center-seam points, not fit or visual acceptance."
+    "review": "V17 retains the V16 pi/8 skirt-fold phase and changes only the overskirt leg-bone influence to zero, making the complete sewn overskirt Hips-only for a pose-isolation trial. Direct V16 renders showed the raised back-center block and two narrow pointed tails in seated/crouched poses unchanged by the fold-phase shift. V15's partial bilateral fade left side-hem thigh weights up to 0.55; this trial isolates whether thigh-driven deformation creates those tails. Neutral coverage, penetration, fit, pose, and appearance remain unverified."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -164,7 +164,7 @@
       "evidenceBoundary": "Provisional pelvis/leg surface window extended to Z 0.42 m for a revised prototype hem near the measured 0.4144 m knee landmark. The window and nearest-surface weights remain hypotheses; no fit, deformation, penetration or runtime acceptance.",
       "weightProfiles": [
         {
-          "method": "hip-anchored-bilateral-center-fade-v2",
+          "method": "hip-only-pose-isolation-v1",
           "pieceIds": [
             "overskirt-front",
             "overskirt-back"
@@ -172,12 +172,12 @@
           "hipBone": "Hips",
           "leftThighBone": "UpperLeg_L",
           "rightThighBone": "UpperLeg_R",
-          "waistThighWeight": 0.15,
-          "hemThighWeight": 0.55,
+          "waistThighWeight": 0.0,
+          "hemThighWeight": 0.0,
           "centerlineHalfWidthM": 0.04,
           "centerlineThighWeightFraction": 0.0,
           "fullSideWeightWidthM": 0.105,
-          "evidenceBoundary": "V14's exact current-source exported overskirt profile measured 1,330 vertices: thigh weight min 0, mean 0.264 and max 0.592, with 168 centerline vertices and balanced 577/585 left/right side counts. V15 tests bilateral center fade with an 80 mm zero-thigh center band, a 105 mm full-side transition and 0.55 hem cap to reduce opposing-leg drag in crouch/sit while retaining moderate lateral thigh follow. Neutral geometry is unchanged; pose response, coverage, strain, continuous collision, fit and runtime remain unverified."
+          "evidenceBoundary": "V17 isolates overskirt pose response by assigning zero UpperLeg influence over all 1,330 skirt vertices while preserving the Hips bone and unchanged sewn rest geometry. V15's bilateral fade still allowed up to 0.55 side-hem thigh influence, and V16's fold-phase shift did not change the visible rear-center block or seated/crouched tails. This trial tests whether thigh-driven deformation is causal; it does not claim coverage, penetration, fit, appearance, or runtime acceptance."
         },
         {
           "method": "hip-anchored-bilateral-center-fade-v2",

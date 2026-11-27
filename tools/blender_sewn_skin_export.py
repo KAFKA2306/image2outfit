@@ -164,6 +164,7 @@ def main():
             if (profile["method"] not in {
                         "hip-anchored-lateral-thigh-fade-v1",
                         "hip-anchored-bilateral-center-fade-v2",
+                        "hip-only-pose-isolation-v1",
                     }
                     or not profile_piece_ids
                     or not profile_piece_ids.issubset(set(region["pieceIds"]))
@@ -174,11 +175,19 @@ def main():
             centerline_fraction = profile.get("centerlineThighWeightFraction", 0.0)
             if (not math.isfinite(centerline_fraction)
                     or not 0 <= centerline_fraction <= 1
-                    or (profile["method"] == "hip-anchored-bilateral-center-fade-v2"
+                    or (profile["method"] in {
+                            "hip-anchored-bilateral-center-fade-v2",
+                            "hip-only-pose-isolation-v1",
+                        }
                         and "centerlineThighWeightFraction" not in profile)
                     or (profile["method"] == "hip-anchored-lateral-thigh-fade-v1"
                         and centerline_fraction != 0.0)):
                 raise ValueError("Invalid centerline thigh-weight fraction for prototype profile")
+            if (profile["method"] == "hip-only-pose-isolation-v1"
+                    and (profile["waistThighWeight"] != 0
+                         or profile["hemThighWeight"] != 0
+                         or centerline_fraction != 0)):
+                raise ValueError("Hip-only pose isolation must assign zero thigh influence")
             for bone_name in (profile["hipBone"], profile["leftThighBone"], profile["rightThighBone"]):
                 if bone_name not in bones:
                     raise ValueError(f"Prototype weight profile bone is missing or non-deform: {bone_name}")
@@ -309,7 +318,10 @@ def main():
                 base_thigh = (profile["waistThighWeight"]
                               + (profile["hemThighWeight"]-profile["waistThighWeight"])*hem_fraction)
                 lateral = abs(point.x-center_x)
-                bilateral_mode = profile["method"] == "hip-anchored-bilateral-center-fade-v2"
+                bilateral_mode = profile["method"] in {
+                    "hip-anchored-bilateral-center-fade-v2",
+                    "hip-only-pose-isolation-v1",
+                }
                 is_bilateral_centerline = (
                     bilateral_mode and lateral <= profile["centerlineHalfWidthM"]
                 )

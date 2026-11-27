@@ -43,10 +43,10 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": "canonical-workflow-checkpoint",
-    "nextAction": "V16 phase shift did not alter the center-back block or pointed tails. Keep appearance rejected and release blocked. Change the cloth-simulation support/settling method or add an explicit rear-panel pose support using current mesh and pose evidence, then re-render all poses. Do not mark fit accepted. UV remains NOT_CREATED; target runtime, Shape Keys, Unity/VRChat, package and release remain UNVERIFIED.",
+    "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T18:18:51Z",
+      "checkedAt": "2026-11-27T20:11:06Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -94,14 +94,14 @@
       "failedAttemptEvidenceAvailable": false,
       "blockedStage": null,
       "failureCode": null,
-      "nextAction": "V16 phase shift did not alter the center-back block or pointed tails. Keep appearance rejected and release blocked. Change the cloth-simulation support/settling method or add an explicit rear-panel pose support using current mesh and pose evidence, then re-render all poses. Do not mark fit accepted. UV remains NOT_CREATED; target runtime, Shape Keys, Unity/VRChat, package and release remain UNVERIFIED."
+      "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "42f454309a30e39e6eaf7a66b49b2e747185e83d9db6ba145cadacd76cb17e30",
+      "reportSha256": "2df4f04f7cb20da9b17207eca48eb250d882dcba254c0de43222d3ac7af063dc",
       "metrics": {
         "vertices": 7426,
         "triangles": 14237,
@@ -110,28 +110,28 @@
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "736f8725b24e3a3faf8101eebb59fcb97efe97f6b5449703b1c819629c79f131"
+      "sourceSha256": "e2330c22777cbd3bebcfe3f8d8e6e2c9da814175b0d5fa50ead241998c2168df"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "980f8477d0d0f5d5e3d5c7574376b7a9abb521b9908f9d04aec1adb58e150e5b",
+      "sha256": "2982824ee5a87dd0b51b6e87b08817e295522cfd81e990b9c500671f008d3fbe",
       "findings": [
         {
           "severity": "BLOCKER",
-          "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-          "description": "V16 crouch and sit renders still crowd the under-shorts and thighs at the inner hip crease. These fixed views do not establish continuous boundary coverage, clearance or strain; shorts fit remains unverified and rejected."
+          "code": "OVERSKIRT_POSE_COLLAPSE",
+          "description": "Directly inspected all five angle views and six pose renders for V17. The measured overskirt group contains 1,330 vertices with one influence each and no upper-leg groups, isolating Hips-only skinning. Despite that change, the back render retains a raised central panel patch and crouch/sit retain long, pointed tails below the seat. Removing thigh-bone transfer alone did not resolve the defect; pose silhouette remains rejected."
         },
         {
           "severity": "BLOCKER",
-          "code": "OVERSKIRT_POSE_COLLAPSE",
-          "description": "The V16 back view still has an angular raised block at center back, and crouch/sit retain two narrow pointed cloth tails below the seat. Moving the eight-cycle fold phase by pi/8 did not remove these visible defects. Silhouette and pose deformation remain rejected."
+          "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
+          "description": "V17 crouch and sit still show the undershorts and inner-hip boundary crowded by the pose. These fixed images do not establish continuous garment coverage, clearance or strain; fit remains unverified and rejected."
         },
         {
           "severity": "MAJOR",
           "code": "JACKET_SURFACE_QUALITY",
-          "description": "V16 front, side, arms-up and arm-cross renders still show triangular faceting across sleeves, shoulders, side torso and waist. Surface quality is rejected."
+          "description": "V17 front, side, back and posed renders still show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T18:19:02.553115+00:00"
+    "generatedAt": "2026-11-27T20:11:41.615056+00:00"
   },
   "blockers": [],
   "outputs": {
