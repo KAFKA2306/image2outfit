@@ -43,17 +43,29 @@ jobs:
           set -euo pipefail
           apt_sources="$(mktemp -d)"
           trap 'rm -rf "$apt_sources"' EXIT
-          while IFS= read -r -d '' source; do
-            if grep -Eqi 'archive\.ubuntu\.com|security\.ubuntu\.com|ports\.ubuntu\.com' "$source"; then
-              cp "$source" "$apt_sources/$(basename "$source")"
-            fi
-          done < <(find /etc/apt -maxdepth 2 -type f \( -name '*.list' -o -name '*.sources' \) -print0)
-          test -n "$(find "$apt_sources" -type f -print -quit)"
-          printf 'Using Ubuntu apt sources:\n'
-          find "$apt_sources" -maxdepth 1 -type f -printf '%f\n' | sort
+          . /etc/os-release
+          ubuntu_codename="${UBUNTU_CODENAME:-${VERSION_CODENAME:-}}"
+          test -n "$ubuntu_codename"
+          keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg
+          test -f "$keyring"
+          source_list="$apt_sources/ubuntu.sources"
+          cat > "$source_list" <<EOF
+          Types: deb
+          URIs: http://archive.ubuntu.com/ubuntu
+          Suites: $ubuntu_codename $ubuntu_codename-updates $ubuntu_codename-backports
+          Components: main universe restricted multiverse
+          Signed-By: $keyring
+
+          Types: deb
+          URIs: http://security.ubuntu.com/ubuntu
+          Suites: $ubuntu_codename-security
+          Components: main universe restricted multiverse
+          Signed-By: $keyring
+          EOF
+          printf 'Using Ubuntu %s archive and security feeds only.\n' "$ubuntu_codename"
           sudo apt-get \
-            -o Dir::Etc::sourcelist=/dev/null \
-            -o Dir::Etc::sourceparts="$apt_sources" \
+            -o Dir::Etc::sourcelist="$source_list" \
+            -o Dir::Etc::sourceparts=- \
             update
           sudo apt-get install -y --no-install-recommends \
             xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
