@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v14-crotch-bridge-geometry-20261127",
+  "designRevision": "v15-hip-supported-skirt-weights-20261128",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V14 increases the lower four-panel shorts wrap width at the crotch end. It is a structural 3D placement hypothesis after V13 weight changes did not visibly improve crouch/sit inner-thigh coverage; ease, clearance and motion remain unverified."
+    "review": "V15 changes the overskirt from a unilateral thigh fade to bilateral center-fade support after direct V14 images still showed rear collapse and pointed tails. The exact V14 exported skirt-weight report measured mean thigh weight 0.264 (min 0, max 0.592; 168 centerline vertices). V15 widens the zero-thigh center band to 80 mm and lowers the side hem cap to 0.55; this is a pose-deformation hypothesis only, not fit or visual acceptance."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -164,7 +164,7 @@
       "evidenceBoundary": "Provisional pelvis/leg surface window extended to Z 0.42 m for a revised prototype hem near the measured 0.4144 m knee landmark. The window and nearest-surface weights remain hypotheses; no fit, deformation, penetration or runtime acceptance.",
       "weightProfiles": [
         {
-          "method": "hip-anchored-lateral-thigh-fade-v1",
+          "method": "hip-anchored-bilateral-center-fade-v2",
           "pieceIds": [
             "overskirt-front",
             "overskirt-back"
@@ -173,10 +173,11 @@
           "leftThighBone": "UpperLeg_L",
           "rightThighBone": "UpperLeg_R",
           "waistThighWeight": 0.15,
-          "hemThighWeight": 0.65,
-          "centerlineHalfWidthM": 0.02,
-          "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
+          "hemThighWeight": 0.55,
+          "centerlineHalfWidthM": 0.04,
+          "centerlineThighWeightFraction": 0.0,
+          "fullSideWeightWidthM": 0.105,
+          "evidenceBoundary": "V14's exact current-source exported overskirt profile measured 1,330 vertices: thigh weight min 0, mean 0.264 and max 0.592, with 168 centerline vertices and balanced 577/585 left/right side counts. V15 tests bilateral center fade with an 80 mm zero-thigh center band, a 105 mm full-side transition and 0.55 hem cap to reduce opposing-leg drag in crouch/sit while retaining moderate lateral thigh follow. Neutral geometry is unchanged; pose response, coverage, strain, continuous collision, fit and runtime remain unverified."
         },
         {
           "method": "hip-anchored-bilateral-center-fade-v2",
