@@ -46,7 +46,7 @@
     "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T20:11:06Z",
+      "checkedAt": "2026-11-27T22:09:26Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -101,7 +101,7 @@
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "2df4f04f7cb20da9b17207eca48eb250d882dcba254c0de43222d3ac7af063dc",
+      "reportSha256": "a8f4d0eaf369d136d4ec01e665fd9a5b37654d2b4aa632acfb61b42e5fddd400",
       "metrics": {
         "vertices": 7426,
         "triangles": 14237,
@@ -110,28 +110,28 @@
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "e2330c22777cbd3bebcfe3f8d8e6e2c9da814175b0d5fa50ead241998c2168df"
+      "sourceSha256": "919fb3e54e6e232d3102d2a9ac88e5fe73f42dd58fdad4e5b4f49ce9a2ec8ceb"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "2982824ee5a87dd0b51b6e87b08817e295522cfd81e990b9c500671f008d3fbe",
+      "sha256": "94544e2209bfc03ce97dfe21bccd8cb07f97680ddb4530ce81ccf8833cfa924e",
       "findings": [
         {
           "severity": "BLOCKER",
           "code": "OVERSKIRT_POSE_COLLAPSE",
-          "description": "Directly inspected all five angle views and six pose renders for V17. The measured overskirt group contains 1,330 vertices with one influence each and no upper-leg groups, isolating Hips-only skinning. Despite that change, the back render retains a raised central panel patch and crouch/sit retain long, pointed tails below the seat. Removing thigh-bone transfer alone did not resolve the defect; pose silhouette remains rejected."
+          "description": "Directly inspected all five angle views and six current pose renders for V18 after rerunning 3D manufacturing from build-blender. The back view retains a raised center patch; front and three-quarter show fabric gathered into a central block; crouch and sit show long pointed tails hanging below the seat. Lowering overskirt cloth bending stiffness from 20 to 8 did not materially resolve the silhouette. Appearance remains rejected."
         },
         {
           "severity": "BLOCKER",
           "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-          "description": "V17 crouch and sit still show the undershorts and inner-hip boundary crowded by the pose. These fixed images do not establish continuous garment coverage, clearance or strain; fit remains unverified and rejected."
+          "description": "Current crouch and sit renders still show shorts and the inner-hip boundary crowded by the pose, with pointed skirt panels extending below the seat. Static images do not establish continuous coverage, clearance or strain; fit remains unverified and rejected."
         },
         {
           "severity": "MAJOR",
           "code": "JACKET_SURFACE_QUALITY",
-          "description": "V17 front, side, back and posed renders still show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
+          "description": "Current front, side, back and posed renders show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T20:11:41.615056+00:00"
+    "generatedAt": "2026-11-27T22:10:56.009184+00:00"
   },
   "blockers": [],
   "outputs": {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v17-hip-only-skirt-pose-isolation-20261128",
+  "revision": "v18-overskirt-soft-settling-20261128",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -21,17 +21,17 @@
     {
       "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "Directly inspected all five angle views and six pose renders for V17. The measured overskirt group contains 1,330 vertices with one influence each and no upper-leg groups, isolating Hips-only skinning. Despite that change, the back render retains a raised central panel patch and crouch/sit retain long, pointed tails below the seat. Removing thigh-bone transfer alone did not resolve the defect; pose silhouette remains rejected."
+      "description": "Directly inspected all five angle views and six current pose renders for V18 after rerunning 3D manufacturing from build-blender. The back view retains a raised center patch; front and three-quarter show fabric gathered into a central block; crouch and sit show long pointed tails hanging below the seat. Lowering overskirt cloth bending stiffness from 20 to 8 did not materially resolve the silhouette. Appearance remains rejected."
     },
     {
       "severity": "BLOCKER",
       "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-      "description": "V17 crouch and sit still show the undershorts and inner-hip boundary crowded by the pose. These fixed images do not establish continuous garment coverage, clearance or strain; fit remains unverified and rejected."
+      "description": "Current crouch and sit renders still show shorts and the inner-hip boundary crowded by the pose, with pointed skirt panels extending below the seat. Static images do not establish continuous coverage, clearance or strain; fit remains unverified and rejected."
     },
     {
       "severity": "MAJOR",
       "code": "JACKET_SURFACE_QUALITY",
-      "description": "V17 front, side, back and posed renders still show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
+      "description": "Current front, side, back and posed renders show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
     }
   ],
   "failedGeometryChecks": [

@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v17-hip-only-skirt-pose-isolation-20261128",
+  "designRevision": "v18-overskirt-soft-settling-20261128",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V17 retains the V16 pi/8 skirt-fold phase and changes only the overskirt leg-bone influence to zero, making the complete sewn overskirt Hips-only for a pose-isolation trial. Direct V16 renders showed the raised back-center block and two narrow pointed tails in seated/crouched poses unchanged by the fold-phase shift. V15's partial bilateral fade left side-hem thigh weights up to 0.55; this trial isolates whether thigh-driven deformation creates those tails. Neutral coverage, penetration, fit, pose, and appearance remain unverified."
+    "review": "V18 holds V17's Hips-only overskirt skinning, V9 panel boundaries, V10 supported radial fold rails, and V16 pi/8 phase constant, and changes only native Blender skirt bending stiffness from 20 to 8 for a softer-settling trial. Direct V17 views still show a raised back-center block at rest and two narrow pointed tails in crouch/sit, despite zero UpperLeg influence on all 1,330 skirt vertices. This isolates whether retained cloth stiffness is contributing to the block/tails before changing panel geometry. It is a diagnostic prototype trial; visual quality, skirt support, fit, coverage, penetration, poses, and runtime remain unverified."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -117,12 +117,12 @@
     "prototypeFrameEnd": 16,
     "remeasureBendingComponentOnInputChange": "pleated-overskirt",
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
-    "reason": "A separate inner-thigh insert remained visibly exposed and did not close crouch/sit coverage. This candidate removes the insert and directly joins the paired front and back lower-rise seams; skirt cloth evidence is separately rebound only for unchanged skirt construction. No shorts coverage, fit or pose acceptance is claimed.",
+    "reason": "A separate inner-thigh insert remained visibly exposed and did not close crouch/sit coverage. This candidate removes the insert and directly joins the paired front and back lower-rise seams. V18 also remeasures overskirt cloth bending at stiffness 8 after V17's stiffness-20 cloth result, while keeping the Hips-only weights and sewn panel geometry fixed. No shorts coverage, fit, skirt support, pose or appearance acceptance is claimed.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
-        "stiffness": 20,
+        "stiffness": 8,
         "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
-        "evidenceSha256": "272b31ce0e7e5cbe55257b6b07ae98deb1d3ff85e3749e7ce4d6b2b93e2436ba",
+        "evidenceSha256": "f6c4d73da057d1969d4c7ee8b62f19ac5e828d87fdffa939488b9900bf8c777b",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
@@ -177,7 +177,7 @@
           "centerlineHalfWidthM": 0.04,
           "centerlineThighWeightFraction": 0.0,
           "fullSideWeightWidthM": 0.105,
-          "evidenceBoundary": "V17 isolates overskirt pose response by assigning zero UpperLeg influence over all 1,330 skirt vertices while preserving the Hips bone and unchanged sewn rest geometry. V15's bilateral fade still allowed up to 0.55 side-hem thigh influence, and V16's fold-phase shift did not change the visible rear-center block or seated/crouched tails. This trial tests whether thigh-driven deformation is causal; it does not claim coverage, penetration, fit, appearance, or runtime acceptance."
+          "evidenceBoundary": "V17 holds skirt geometry constant and assigns zero UpperLeg influence over all 1,330 vertices. Direct V17 renders retained the raised rest back-center block and seated/crouched pointed tails; V18 keeps this weight map fixed while lowering native cloth bending stiffness from 20 to 8 to test softer settling. It does not claim coverage, penetration, fit, appearance, or runtime acceptance."
         },
         {
           "method": "hip-anchored-bilateral-center-fade-v2",
