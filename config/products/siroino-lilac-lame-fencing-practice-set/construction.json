@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v15-hip-supported-skirt-weights-20261128",
+  "designRevision": "v16-skirt-center-fold-valley-20261128",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V15 changes the overskirt from a unilateral thigh fade to bilateral center-fade support after direct V14 images still showed rear collapse and pointed tails. The exact V14 exported skirt-weight report measured mean thigh weight 0.264 (min 0, max 0.592; 168 centerline vertices). V15 widens the zero-thigh center band to 80 mm and lowers the side hem cap to 0.55; this is a pose-deformation hypothesis only, not fit or visual acceptance."
+    "review": "V16 retains V15's measured hip-supported bilateral skirt weights and changes only the eight-cycle radial fold phase. The V15 back and seated renders show a sharp raised fold at the back center seam and two narrow tails below the seat; with eight cycles the cardinal center seams align to cosine crests at phase 0. A pi/8 phase moves those center seams to valleys while preserving the 45-degree cycle spacing. This is a geometry hypothesis for reducing center-seam points, not fit or visual acceptance."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -122,7 +122,7 @@
       "pleated-overskirt": {
         "stiffness": 20,
         "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
-        "evidenceSha256": "dc05e58b7a28c2a5f4b347516ff408f70921f61aae61ef34369666ac9752e68b",
+        "evidenceSha256": "272b31ce0e7e5cbe55257b6b07ae98deb1d3ff85e3749e7ce4d6b2b93e2436ba",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }

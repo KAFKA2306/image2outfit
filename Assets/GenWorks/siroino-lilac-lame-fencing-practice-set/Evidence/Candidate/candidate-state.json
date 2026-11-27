@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v15-hip-supported-skirt-weights-20261128",
+  "revision": "v16-skirt-center-fold-valley-20261128",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "severity": "BLOCKER",
       "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-      "severity": "BLOCKER",
-      "description": "The V15 crouch and sit renders still show the under-shorts and thighs crowded together at the inner hip crease. These fixed views do not establish continuous boundary coverage, clearance or strain; shorts fit remains unverified and rejected."
+      "description": "V16 crouch and sit renders still crowd the under-shorts and thighs at the inner hip crease. These fixed views do not establish continuous boundary coverage, clearance or strain; shorts fit remains unverified and rejected."
     },
     {
+      "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "severity": "BLOCKER",
-      "description": "The V15 rear view still shows an angular raised block at center back; crouch and sit still show two narrow pointed cloth tails hanging below the seat. The revised weight profile did not remove these visible defects. Silhouette and pose deformation remain rejected."
+      "description": "The V16 back view still has an angular raised block at center back, and crouch/sit retain two narrow pointed cloth tails below the seat. Moving the eight-cycle fold phase by pi/8 did not remove these visible defects. Silhouette and pose deformation remain rejected."
     },
     {
-      "code": "JACKET_SURFACE_QUALITY",
       "severity": "MAJOR",
-      "description": "V15 front, side, arms-up and arm-cross renders still show triangular faceting across sleeves, shoulders, side torso and waist. Surface quality is rejected."
+      "code": "JACKET_SURFACE_QUALITY",
+      "description": "V16 front, side, arms-up and arm-cross renders still show triangular faceting across sleeves, shoulders, side torso and waist. Surface quality is rejected."
     }
   ],
   "failedGeometryChecks": [
