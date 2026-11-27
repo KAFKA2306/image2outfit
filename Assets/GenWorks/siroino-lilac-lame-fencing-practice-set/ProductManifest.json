@@ -46,7 +46,7 @@
     "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-27T22:09:26Z",
+      "checkedAt": "2026-11-27T22:51:55Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -101,37 +101,37 @@
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "a8f4d0eaf369d136d4ec01e665fd9a5b37654d2b4aa632acfb61b42e5fddd400",
+      "reportSha256": "51d2a5268112200492786d78566edbd1d247384cb8655866205b42c6a31f1759",
       "metrics": {
-        "vertices": 7426,
-        "triangles": 14237,
-        "unweightedVertices": 7426,
+        "vertices": 7002,
+        "triangles": 13385,
+        "unweightedVertices": 7002,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "919fb3e54e6e232d3102d2a9ac88e5fe73f42dd58fdad4e5b4f49ce9a2ec8ceb"
+      "sourceSha256": "ee2ebbe7fc8614ded594534deefc820aeb59b9ea27473bc518566ddc2bc9e93b"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "94544e2209bfc03ce97dfe21bccd8cb07f97680ddb4530ce81ccf8833cfa924e",
+      "sha256": "16daa60a16d314e438e62031e3c3787921e541e2fe6265eecebf310404a9e816",
       "findings": [
         {
-          "severity": "BLOCKER",
+          "description": "Directly inspected all five current V19 angle images and all six V19 pose renders. The neutral/front three-quarter views still show the overskirt gathered into a hard central folded mass, and the back view retains a raised center patch. Crouch and sit still show two narrow pointed tails extending below the seat. Shortening the panels from 95 mm to 65 mm reduced free-hanging depth but did not resolve the pose collapse. Appearance remains rejected.",
           "code": "OVERSKIRT_POSE_COLLAPSE",
-          "description": "Directly inspected all five angle views and six current pose renders for V18 after rerunning 3D manufacturing from build-blender. The back view retains a raised center patch; front and three-quarter show fabric gathered into a central block; crouch and sit show long pointed tails hanging below the seat. Lowering overskirt cloth bending stiffness from 20 to 8 did not materially resolve the silhouette. Appearance remains rejected."
+          "severity": "BLOCKER"
         },
         {
-          "severity": "BLOCKER",
+          "description": "V19 crouch and sit views still leave the inner-hip and seat coverage boundary unclear where the shorts, thighs and overskirt overlap. Static renders do not establish continuous coverage, clearance or strain; fit and coverage remain unverified and rejected.",
           "code": "SHORTS_COVERAGE_REQUIRES_FIT_REVIEW",
-          "description": "Current crouch and sit renders still show shorts and the inner-hip boundary crowded by the pose, with pointed skirt panels extending below the seat. Static images do not establish continuous coverage, clearance or strain; fit remains unverified and rejected."
+          "severity": "BLOCKER"
         },
         {
-          "severity": "MAJOR",
+          "description": "V19 front, side, back and posed renders continue to show pronounced triangular faceting and uneven surface finish across the jacket sleeves, shoulders, torso and waist. Surface quality remains rejected.",
           "code": "JACKET_SURFACE_QUALITY",
-          "description": "Current front, side, back and posed renders show pronounced triangular faceting across jacket sleeves, shoulders, torso and waist. Surface finish remains rejected."
+          "severity": "MAJOR"
         }
       ],
       "grantsQualityAcceptance": false
@@ -218,7 +218,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-27T22:10:56.009184+00:00"
+    "generatedAt": "2026-11-27T22:53:35.008741+00:00"
   },
   "blockers": [],
   "outputs": {
