@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v19-overskirt-65mm-hem-depth-20261128",
+  "designRevision": "v20-overskirt-twelve-cycle-folds-20261128",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V19 retains V18's stiffness-8 setting, Hips-only overskirt skinning, V10 supported radial fold rails, and V16 pi/8 phase. It changes only the front/back overskirt pattern depth from 95 mm to 65 mm, preserving the 235 mm flat half-width and waist edge. V18 directly retained a raised back-center block and narrow pointed crouch/sit tails; this trial tests whether reducing free-hanging panel length improves those shapes. It is a diagnostic prototype trial; pleat retention, shorts coverage, support, fit, penetration, poses, and runtime remain unverified."
+    "review": "V20 holds V19 pattern dimensions, cloth stiffness, Hips-only weights, radial amplitude, and waist placement fixed. It increases supported fold cycles from 8 to 12. Phase changes from pi/8 to pi/12 to keep cardinal center seams in valleys under the same signed-cosine rule. This is a diagnostic 3D construction trial prompted by V19 neutral central bunching, raised back-center patch, and paired pointed crouch/sit tails. It tests fold spacing only; appearance, pose, fit, shorts coverage, penetration, material behavior, and runtime remain unverified."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -117,12 +117,12 @@
     "prototypeFrameEnd": 16,
     "remeasureBendingComponentOnInputChange": "pleated-overskirt",
     "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
-    "reason": "A separate inner-thigh insert remained visibly exposed and did not close crouch/sit coverage. This candidate removes the insert and directly joins the paired front and back lower-rise seams. V19 keeps V18's cloth stiffness at 8 and holds Hips-only skirt weights constant while shortening the pattern depth from 95 mm to 65 mm after V18 retained a raised back-center block and pointed pose tails. No shorts coverage, fit, skirt support, pose or appearance acceptance is claimed.",
+    "reason": "V20 keeps V19 panel depth, waist, 235 mm half-width, Hips-only weights, stiffness 8, and 6 mm fold amplitude; it increases supported alternating radial fold cycles from 8 to 12 and recalculates phase from pi/8 to pi/12 so front/back center seams remain valleys. V19 still showed a hard central mass and paired pointed tails after shortening to 65 mm. This trial tests narrower pleat spacing while preserving all other declared skirt parameters; no pose, fit, coverage, fabric, or visual acceptance is claimed.",
     "prototypeComponentBending": {
       "pleated-overskirt": {
         "stiffness": 8,
         "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
-        "evidenceSha256": "a2af9f5b197a78d161499ca09e57672adf34bfd588d1befc4f91a5f858650b64",
+        "evidenceSha256": "a3b2528360aef993c7addf7c6f82f0ace604faa725a8a3c91c3d3a811f74ea75",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
