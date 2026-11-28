@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v21-smooth-garment-shading-20261128",
+  "revision": "v22-sewn-surface-mesh-refinement-20261128",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -21,22 +21,22 @@
     {
       "severity": "BLOCKER",
       "code": "OVERSKIRT_POSE_COLLAPSE",
-      "description": "Direct inspection of all five current angle views and six pose renders: the rear overskirt still forms a raised central fold mass, and crouch/sit show two long, pointed tails extending below the seated silhouette. Pleat shape and coverage remain unacceptable; no appearance acceptance."
+      "description": "Direct inspection of the five V22 angle views and six poses: the back-center overskirt remains a raised irregular mass, side views show sharp outward kick-outs, and crouch/sit retain long pointed tails below the seated silhouette. Uniformly splitting sewn edges did not correct the skirt collapse or coverage; no appearance acceptance."
     },
     {
       "severity": "BLOCKER",
-      "code": "JACKET_SURFACE_FACETING_REMAINS",
-      "description": "The V21 smooth-polygon shading change does not remove the visible small-scale triangular crumpling across sleeves, shoulders, torso and waist in current renders. Surface finish remains rejected."
+      "code": "JACKET_SURFACE_WRINKLING_REMAINS",
+      "description": "The V22 denser simulation mesh leaves sharp small-scale gathers across both sleeves, shoulders and underarms; the torso also shows irregular surface creases. Surface finish remains rejected."
     },
     {
       "severity": "BLOCKER",
       "code": "FIT_AND_COVERAGE_UNVERIFIED",
-      "description": "Static posed images do not establish continuous body clearance, strain or shorts coverage at inner hip and seat during movement. Fit, deformation and runtime remain unverified and rejected."
+      "description": "The posed renders do not establish continuous body clearance, strain, or shorts coverage at inner hip and seat through movement. Fit, deformation and runtime remain unverified and rejected."
     },
     {
       "severity": "MAJOR",
       "code": "COLLAR_AND_ARM_DEFORMATION",
-      "description": "Current side and arms-up renders retain a tall neck opening and pronounced sleeve/underarm folds. Clearance and deformation quality remain unapproved."
+      "description": "Side and arms-up views retain a tall collar profile and pronounced sleeve/underarm gathers. Neck clearance and arm deformation remain unapproved."
     }
   ],
   "failedGeometryChecks": [

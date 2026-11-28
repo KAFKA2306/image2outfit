@@ -923,6 +923,15 @@ def split_declared_skirt_creases(mesh, pose):
             cuts.append({"planeAngleRadians": angle, "newVertexCount": len(added),
                          "cutEdgeCount": sum(isinstance(g, bmesh.types.BMEdge) for g in result["geom_cut"])})
         bmesh.ops.triangulate(bm, faces=list(bm.faces))
+        refinement = spec.get("simulationSurfaceRefinement")
+        refinement_evidence = {"applied": False}
+        if refinement is not None:
+            if refinement != {
+                "method": "uniform-one-cut-per-sewn-edge",
+                "cuts": 1,
+                "target": "all-garment-panels",
+            }:
+                raise ValueError("Unsupported simulation surface refinement contract")
         original = {v[original_id]-1: v for v in bm.verts if v[original_id] > 0}
         if set(original) != set(range(initial_count)):
             raise ValueError("Crease cuts lost original sewn vertex identity")
@@ -950,7 +959,89 @@ def split_declared_skirt_creases(mesh, pose):
         if non_manifold:
             raise ValueError("Crease cuts created non-manifold edges")
         mesh.update(vertices=result_vertices, faces=result_faces, facePieceIds=result_owners)
+        if refinement is not None:
+            from collections import Counter
+
+            before_vertices = mesh["vertices"]
+            before_faces = mesh["faces"]
+            before_owners = mesh["facePieceIds"]
+            if any(len(face) != 3 for face in before_faces) or len(before_faces) != len(before_owners):
+                raise ValueError("Uniform surface refinement requires complete triangular face ownership")
+            before_vertex_count = len(before_vertices)
+            before_triangle_count = len(before_faces)
+            edge_lengths = {}
+            for face in before_faces:
+                for start, end in zip(face, face[1:] + face[:1]):
+                    edge = tuple(sorted((start, end)))
+                    a, b = Vector(before_vertices[start]), Vector(before_vertices[end])
+                    edge_lengths[edge] = (b-a).length
+            before_max_edge_length = max(edge_lengths.values(), default=0.0)
+            midpoints = {}
+            refined_vertices = [list(point) for point in before_vertices]
+            refined_faces = []
+            refined_owners = []
+
+            def midpoint(start, end):
+                edge = tuple(sorted((start, end)))
+                if edge not in midpoints:
+                    a, b = before_vertices[start], before_vertices[end]
+                    midpoints[edge] = len(refined_vertices)
+                    refined_vertices.append([(a[i] + b[i]) / 2 for i in range(3)])
+                return midpoints[edge]
+
+            for face, piece in zip(before_faces, before_owners):
+                a, b, c = face
+                ab, bc, ca = midpoint(a, b), midpoint(b, c), midpoint(c, a)
+                refined_faces.extend(([a, ab, ca], [ab, b, bc], [ca, bc, c], [ab, bc, ca]))
+                refined_owners.extend((piece, piece, piece, piece))
+            after_edges = Counter()
+            after_edge_lengths = {}
+            for face in refined_faces:
+                for start, end in zip(face, face[1:] + face[:1]):
+                    edge = tuple(sorted((start, end)))
+                    after_edges[edge] += 1
+                    a, b = Vector(refined_vertices[start]), Vector(refined_vertices[end])
+                    after_edge_lengths[edge] = (b-a).length
+            non_manifold_refined = sum(count > 2 for count in after_edges.values())
+            if non_manifold_refined:
+                raise ValueError("Uniform surface refinement created non-manifold edges")
+            if len(refined_faces) != len(refined_owners) or any(piece not in pieces for piece in refined_owners):
+                raise ValueError("Uniform surface refinement lost canonical face ownership")
+            seam_edges_after = 0
+            skirt_pieces = set(spec["pieceIds"])
+            band_pieces = set(spec["seamContinuationPieceIds"])
+            skirt_edges_after = set()
+            band_edges_after = set()
+            for face, piece in zip(refined_faces, refined_owners):
+                edges = {tuple(sorted((start, end))) for start, end in zip(face, face[1:] + face[:1])}
+                if piece in skirt_pieces:
+                    skirt_edges_after.update(edges)
+                if piece in band_pieces:
+                    band_edges_after.update(edges)
+            seam_edges_after = len(skirt_edges_after & band_edges_after)
+            if seam_edges_after != len(seam_edges) * 2:
+                raise ValueError("Uniform surface refinement changed sewn skirt/waist seam pairing")
+            mesh.update(vertices=refined_vertices, faces=refined_faces, facePieceIds=refined_owners)
+            refinement_evidence = {
+                "applied": True,
+                "configuration": refinement,
+                "beforeVertexCount": before_vertex_count,
+                "afterVertexCount": len(refined_vertices),
+                "beforeTriangleCount": before_triangle_count,
+                "afterTriangleCount": len(refined_faces),
+                "insertedVertexCount": len(midpoints),
+                "maximumEdgeLengthBeforeM": before_max_edge_length,
+                "maximumEdgeLengthAfterM": max(after_edge_lengths.values(), default=0.0),
+                "canonicalPieceOwnershipPreserved": True,
+                "sewnEdgeSubdivisionAppliedSymmetrically": True,
+                "sharedSkirtWaistbandEdgeCountBefore": len(seam_edges),
+                "sharedSkirtWaistbandEdgeCountAfter": seam_edges_after,
+                "nonManifoldEdgeCountAfter": non_manifold_refined,
+                "grantsFitAcceptance": False,
+                "grantsVisualAcceptance": False,
+            }
         return {"applied": True, "method": spec["method"], "cuts": cuts,
+                "simulationSurfaceRefinement": refinement_evidence,
                 "beforeVertexCount": initial_count, "afterVertexCount": len(ordered),
                 "beforeTriangleCount": initial_face_count, "afterTriangleCount": len(result_faces),
                 "sharedSkirtWaistbandEdgeCount": len(seam_edges),

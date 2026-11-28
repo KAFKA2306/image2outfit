@@ -46,7 +46,7 @@
     "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders.",
     "lastAttempt": {
       "status": "EXECUTED",
-      "checkedAt": "2026-11-28T08:58:29Z",
+      "checkedAt": "2026-11-28T10:48:20Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "completedStages": {
@@ -101,42 +101,42 @@
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "4d03b86266cb8dee4a7fa067a1acd06575e09cf8f4b91542de58161645d605ac",
+      "reportSha256": "164dbff29a78c81675d97477c72a926f7840e9b205016e908725fff17d5bf693",
       "metrics": {
-        "vertices": 7196,
-        "triangles": 13765,
-        "unweightedVertices": 7196,
+        "vertices": 28158,
+        "triangles": 55060,
+        "unweightedVertices": 28158,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false,
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "a00999c9e692be849e158136108fae5ae744c4524523de0deb6877432c5d4aab"
+      "sourceSha256": "8e62d7be328f483db5ac2602904f69261ee7ed95ec2d7d48d564d33437f4038f"
     },
     "currentVisualReview": {
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "972700c5058f382a157e4ff4534dfbe639abe93160efb880dd19df87f6696b07",
+      "sha256": "4947b69b1971cbb29f625fa791f87fa2e80eb46df180560a8148c07de993d5fe",
       "findings": [
         {
           "severity": "BLOCKER",
           "code": "OVERSKIRT_POSE_COLLAPSE",
-          "description": "Direct inspection of all five current angle views and six pose renders: the rear overskirt still forms a raised central fold mass, and crouch/sit show two long, pointed tails extending below the seated silhouette. Pleat shape and coverage remain unacceptable; no appearance acceptance."
+          "description": "Direct inspection of the five V22 angle views and six poses: the back-center overskirt remains a raised irregular mass, side views show sharp outward kick-outs, and crouch/sit retain long pointed tails below the seated silhouette. Uniformly splitting sewn edges did not correct the skirt collapse or coverage; no appearance acceptance."
         },
         {
           "severity": "BLOCKER",
-          "code": "JACKET_SURFACE_FACETING_REMAINS",
-          "description": "The V21 smooth-polygon shading change does not remove the visible small-scale triangular crumpling across sleeves, shoulders, torso and waist in current renders. Surface finish remains rejected."
+          "code": "JACKET_SURFACE_WRINKLING_REMAINS",
+          "description": "The V22 denser simulation mesh leaves sharp small-scale gathers across both sleeves, shoulders and underarms; the torso also shows irregular surface creases. Surface finish remains rejected."
         },
         {
           "severity": "BLOCKER",
           "code": "FIT_AND_COVERAGE_UNVERIFIED",
-          "description": "Static posed images do not establish continuous body clearance, strain or shorts coverage at inner hip and seat during movement. Fit, deformation and runtime remain unverified and rejected."
+          "description": "The posed renders do not establish continuous body clearance, strain, or shorts coverage at inner hip and seat through movement. Fit, deformation and runtime remain unverified and rejected."
         },
         {
           "severity": "MAJOR",
           "code": "COLLAR_AND_ARM_DEFORMATION",
-          "description": "Current side and arms-up renders retain a tall neck opening and pronounced sleeve/underarm folds. Clearance and deformation quality remain unapproved."
+          "description": "Side and arms-up views retain a tall collar profile and pronounced sleeve/underarm gathers. Neck clearance and arm deformation remain unapproved."
         }
       ],
       "grantsQualityAcceptance": false
@@ -223,7 +223,7 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-28T09:00:33.289561+00:00"
+    "generatedAt": "2026-11-28T10:49:20.037653+00:00"
   },
   "blockers": [],
   "outputs": {

@@ -85,7 +85,7 @@
       "back",
       "right"
     ],
-    "review": "V21 preserves V20 panel dimensions, sewn topology, pleat rails, material, body placement, skinning weights, and pose inputs. It changes only the garment mesh polygon shading from flat to smooth after direct V20 render inspection showed hard triangular faceting across jacket surfaces. Vertex positions and mesh topology are unchanged. This isolates shading response; the overskirt collapse, fit, coverage, penetration, shape-key deformation, material response, and runtime remain unverified."
+    "review": "V22 preserves V21 pattern boundaries, body placement, pleat amplitude, materials, weights, and pose inputs. It splits every sewn garment edge once before cloth simulation so the solver receives a denser, more uniform cloth surface rather than large triangulated spans. The trial records vertex, face, and edge-length changes and must be judged from fresh neutral and pose renders; it does not establish fit, coverage, penetration, shape-key deformation, appearance, or runtime acceptance."
   },
   "bodyProfileEvidence": {
     "status": "MEASURED_BODY_ONLY",
@@ -122,7 +122,7 @@
       "pleated-overskirt": {
         "stiffness": 8,
         "evidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-bending-remeasurement.json",
-        "evidenceSha256": "a3b2528360aef993c7addf7c6f82f0ace604faa725a8a3c91c3d3a811f74ea75",
+        "evidenceSha256": "e77f04324162b4d4fcc8aa41ca0f4325b8a60082930164b86c5d1ff69d80dbab",
         "evidenceBoundary": "Direct bounded native Blender Cloth solve on the current sewn prototype; component bending stiffness and exact source/pose/pattern/body hashes recorded. Diagnostic geometry only; no fit, pose, or visual acceptance."
       }
     }
