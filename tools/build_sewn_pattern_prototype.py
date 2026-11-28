@@ -1103,6 +1103,13 @@ def main():
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
+    # The garment panels are triangulated, but their visible cloth surfaces
+    # are continuous. Flat face normals made the current jacket read as hard
+    # triangular facets in the directly inspected V20 renders. Smooth only
+    # the garment surface normals; this does not move vertices or change the
+    # sewn topology and does not grant appearance acceptance.
+    for polygon in data.polygons:
+        polygon.use_smooth = True
     owners = mesh["facePieceIds"]
     pieces = sorted(set(owners))
     if len(owners) != len(data.polygons):
@@ -1155,6 +1162,9 @@ def main():
         "metrics": {"vertices": len(data.vertices), "triangles": len(data.polygons),
                     "unweightedVertices": len(data.vertices),
                     "degenerateTriangles": mesh["topology"]["degenerateFaceCount"]},
+        "surfaceShading": {"mode": "SMOOTH", "smoothPolygonCount": len(data.polygons),
+                            "flatPolygonCount": sum(not polygon.use_smooth for polygon in data.polygons),
+                            "vertexCoordinatesChanged": False, "grantsVisualAcceptance": False},
         "geometryGate": {"checks": {"sewnTopologyValid": True,
             "avatarFitVerified": False, "deformWeightsVerified": False}},
         "pending": ["panel placement and physical cloth settling", "avatar fit",
