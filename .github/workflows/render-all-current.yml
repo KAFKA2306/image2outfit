@@ -77,9 +77,22 @@ jobs:
             libgl1 libegl1 libx11-6 libxxf86vm1
       - name: Download pinned Blender
         run: |
+          set -euo pipefail
           BLENDER_VERSION="$(python -c "import json; print(json.load(open('config/toolchain-lock.json'))['blender']['version'])")"
+          BLENDER_SHA256="$(python -c "import json; print(json.load(open('config/toolchain-lock.json'))['blender']['linuxX64ArchiveSha256'])")"
           BLENDER_SERIES="${BLENDER_VERSION%.*}"
-          curl --fail --location --retry 4 --retry-all-errors "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" -o blender.tar.xz
+          OFFICIAL_URL="https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          MIRROR_URL="https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          if curl --fail --location --retry 2 --retry-delay 2 "$OFFICIAL_URL" -o blender.tar.xz; then
+            printf 'Downloaded pinned Blender from the official source.\n'
+          else
+            printf 'Official Blender download failed; trying the configured mirror.\n' >&2
+            curl --fail --location --retry 2 --retry-delay 2 "$MIRROR_URL" -o blender.tar.xz
+          fi
+          printf '%s  %s\n' "$BLENDER_SHA256" blender.tar.xz | sha256sum --check --status || {
+            printf 'Pinned Blender archive SHA-256 mismatch; refusing to extract.\n' >&2
+            exit 1
+          }
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
           echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
